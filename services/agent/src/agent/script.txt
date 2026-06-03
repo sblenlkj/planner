@@ -1,0 +1,81 @@
+cd ~/VS_CodeProjects/projects/planner/services/agent
+
+mkdir -p src/agent/{entrypoints,application,agents,workflows/common,tools/backend,clients,llm,security,schemas,tracing}
+
+mkdir -p src/agent/agents/router_agent
+mkdir -p src/agent/agents/default_assistant_agent
+mkdir -p src/agent/agents/profile_setup_agent
+mkdir -p src/agent/agents/schedule_setup_agent
+mkdir -p src/agent/agents/notes_capture_agent
+mkdir -p src/agent/agents/system/profile_reflection_agent
+mkdir -p src/agent/agents/system/graph_update_agent
+
+touch src/agent/main.py
+touch src/agent/settings.py
+
+touch src/agent/entrypoints/__init__.py
+touch src/agent/entrypoints/fastapi.py
+touch src/agent/entrypoints/routes_agent.py
+touch src/agent/entrypoints/routes_llm.py
+touch src/agent/entrypoints/routes_jobs.py
+
+touch src/agent/application/__init__.py
+touch src/agent/application/run_agent_turn.py
+touch src/agent/application/run_llm_task.py
+touch src/agent/application/run_system_job.py
+
+touch src/agent/agents/__init__.py
+touch src/agent/agents/system/__init__.py
+
+for agent_dir in \
+  src/agent/agents/router_agent \
+  src/agent/agents/default_assistant_agent \
+  src/agent/agents/profile_setup_agent \
+  src/agent/agents/schedule_setup_agent \
+  src/agent/agents/notes_capture_agent \
+  src/agent/agents/system/profile_reflection_agent \
+  src/agent/agents/system/graph_update_agent
+do
+  touch "$agent_dir/__init__.py"
+  touch "$agent_dir/definition.py"
+  touch "$agent_dir/prompts.py"
+  touch "$agent_dir/schemas.py"
+  touch "$agent_dir/workflow.py"
+  touch "$agent_dir/tools.py"
+done
+
+touch src/agent/workflows/__init__.py
+touch src/agent/workflows/common/__init__.py
+
+touch src/agent/tools/__init__.py
+touch src/agent/tools/registry.py
+touch src/agent/tools/backend/__init__.py
+touch src/agent/tools/backend/user_tools.py
+touch src/agent/tools/backend/schedule_tools.py
+touch src/agent/tools/backend/plan_tools.py
+touch src/agent/tools/backend/graph_tools.py
+touch src/agent/tools/backend/analytics_tools.py
+
+touch src/agent/clients/__init__.py
+touch src/agent/clients/backend_grpc.py
+
+touch src/agent/llm/__init__.py
+touch src/agent/llm/provider_client.py
+touch src/agent/llm/provider_pool.py
+touch src/agent/llm/slot_router.py
+touch src/agent/llm/task_cache.py
+
+touch src/agent/security/__init__.py
+touch src/agent/security/input_guard.py
+touch src/agent/security/output_guard.py
+touch src/agent/security/tool_permissions.py
+
+touch src/agent/schemas/__init__.py
+touch src/agent/schemas/agent_turn.py
+touch src/agent/schemas/llm_task.py
+touch src/agent/schemas/jobs.py
+touch src/agent/schemas/messages.py
+
+touch src/agent/tracing/__init__.py
+touch src/agent/tracing/context.py
+touch src/agent/tracing/spans.py
