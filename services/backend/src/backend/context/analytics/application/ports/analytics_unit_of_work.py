@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from backend.context.analytics.application.ports.analytics_insight_repository import (
-    AnalyticsInsightRepository,
+from backend.context.analytics.application.ports.analytics_read_repository import (
+    AnalyticsReadRepository,
 )
-from backend.context.analytics.application.ports.analytics_observation_repository import (
-    AnalyticsObservationRepository,
+from backend.context.analytics.application.ports.analytics_write_repository import (
+    AnalyticsWriteRepository,
 )
 
 
 class AnalyticsUnitOfWork(Protocol):
-    observations: AnalyticsObservationRepository
-    insights: AnalyticsInsightRepository
+    analytics_writer: AnalyticsWriteRepository
+    analytics_reader: AnalyticsReadRepository

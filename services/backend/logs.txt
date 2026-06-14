@@ -1,0 +1,251 @@
+*[main][~/VS_CodeProjects/projects/planner/services/backend]$ uv run backend
+INFO:     Will watch for changes in these directories: ['/Users/dmitrijkanevskij/VS_CodeProjects/projects/planner/services/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
+INFO:     Started reloader process [30759] using StatReload
+INFO:     Started server process [30776]
+INFO:     Waiting for application startup.
+{"event": "select pg_catalog.version()", "level": "info", "timestamp": "2026-06-14T09:44:19.159140Z"}
+{"event": "[raw sql] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.159240Z"}
+{"event": "select current_schema()", "level": "info", "timestamp": "2026-06-14T09:44:19.173113Z"}
+{"event": "[raw sql] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.173199Z"}
+{"event": "show standard_conforming_strings", "level": "info", "timestamp": "2026-06-14T09:44:19.177030Z"}
+{"event": "[raw sql] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.177128Z"}
+{"event": "BEGIN (implicit)", "level": "info", "timestamp": "2026-06-14T09:44:19.179094Z"}
+{"event": "SELECT pg_catalog.pg_class.relname \nFROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace \nWHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.181286Z"}
+{"event": "[generated in 0.00016s] ('analytics_observations', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')", "level": "info", "timestamp": "2026-06-14T09:44:19.181367Z"}
+{"event": "SELECT pg_catalog.pg_class.relname \nFROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace \nWHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.195050Z"}
+{"event": "[cached since 0.01394s ago] ('analytics_insights', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')", "level": "info", "timestamp": "2026-06-14T09:44:19.195141Z"}
+{"event": "SELECT pg_catalog.pg_class.relname \nFROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace \nWHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.195974Z"}
+{"event": "[cached since 0.01483s ago] ('courses', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')", "level": "info", "timestamp": "2026-06-14T09:44:19.196050Z"}
+{"event": "SELECT pg_catalog.pg_class.relname \nFROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace \nWHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.197039Z"}
+{"event": "[cached since 0.01591s ago] ('course_tasks', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')", "level": "info", "timestamp": "2026-06-14T09:44:19.197117Z"}
+{"event": "SELECT pg_catalog.pg_class.relname \nFROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace \nWHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.198249Z"}
+{"event": "[cached since 0.01711s ago] ('course_observations', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')", "level": "info", "timestamp": "2026-06-14T09:44:19.198309Z"}
+{"event": "SELECT pg_catalog.pg_class.relname \nFROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace \nWHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.199123Z"}
+{"event": "[cached since 0.018s ago] ('course_task_observations', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')", "level": "info", "timestamp": "2026-06-14T09:44:19.199196Z"}
+{"event": "SELECT pg_catalog.pg_class.relname \nFROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace \nWHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.199822Z"}
+{"event": "[cached since 0.01868s ago] ('runtime_jobs', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')", "level": "info", "timestamp": "2026-06-14T09:44:19.199882Z"}
+{"event": "SELECT pg_catalog.pg_class.relname \nFROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace \nWHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.200819Z"}
+{"event": "[cached since 0.01968s ago] ('runtime_job_executions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')", "level": "info", "timestamp": "2026-06-14T09:44:19.200886Z"}
+{"event": "SELECT pg_catalog.pg_class.relname \nFROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace \nWHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.201693Z"}
+{"event": "[cached since 0.02056s ago] ('schedule_reminders', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')", "level": "info", "timestamp": "2026-06-14T09:44:19.201760Z"}
+{"event": "SELECT pg_catalog.pg_class.relname \nFROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace \nWHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.202388Z"}
+{"event": "[cached since 0.02125s ago] ('schedule_deadlines', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')", "level": "info", "timestamp": "2026-06-14T09:44:19.202450Z"}
+{"event": "SELECT pg_catalog.pg_class.relname \nFROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace \nWHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.203075Z"}
+{"event": "[cached since 0.02193s ago] ('weekly_schedule_templates', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')", "level": "info", "timestamp": "2026-06-14T09:44:19.203121Z"}
+{"event": "SELECT pg_catalog.pg_class.relname \nFROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace \nWHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.203840Z"}
+{"event": "[cached since 0.02271s ago] ('schedule_day_templates', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')", "level": "info", "timestamp": "2026-06-14T09:44:19.203906Z"}
+{"event": "SELECT pg_catalog.pg_class.relname \nFROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace \nWHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.204989Z"}
+{"event": "[cached since 0.02386s ago] ('schedule_template_time_blocks', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')", "level": "info", "timestamp": "2026-06-14T09:44:19.205103Z"}
+{"event": "SELECT pg_catalog.pg_class.relname \nFROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace \nWHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.206070Z"}
+{"event": "[cached since 0.02495s ago] ('weekly_schedule_observations', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')", "level": "info", "timestamp": "2026-06-14T09:44:19.206150Z"}
+{"event": "SELECT pg_catalog.pg_class.relname \nFROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace \nWHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.207050Z"}
+{"event": "[cached since 0.02591s ago] ('schedule_days', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')", "level": "info", "timestamp": "2026-06-14T09:44:19.207111Z"}
+{"event": "SELECT pg_catalog.pg_class.relname \nFROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace \nWHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.207890Z"}
+{"event": "[cached since 0.02676s ago] ('scheduled_blocks', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')", "level": "info", "timestamp": "2026-06-14T09:44:19.207955Z"}
+{"event": "SELECT pg_catalog.pg_class.relname \nFROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace \nWHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.208645Z"}
+{"event": "[cached since 0.0275s ago] ('scheduled_activities', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')", "level": "info", "timestamp": "2026-06-14T09:44:19.208690Z"}
+{"event": "SELECT pg_catalog.pg_class.relname \nFROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace \nWHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.209317Z"}
+{"event": "[cached since 0.02817s ago] ('schedule_day_observations', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')", "level": "info", "timestamp": "2026-06-14T09:44:19.209364Z"}
+{"event": "SELECT pg_catalog.pg_class.relname \nFROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace \nWHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.210261Z"}
+{"event": "[cached since 0.02912s ago] ('schedule_date_observations', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')", "level": "info", "timestamp": "2026-06-14T09:44:19.210315Z"}
+{"event": "SELECT pg_catalog.pg_class.relname \nFROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace \nWHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.211395Z"}
+{"event": "[cached since 0.03027s ago] ('users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')", "level": "info", "timestamp": "2026-06-14T09:44:19.211466Z"}
+{"event": "SELECT pg_catalog.pg_class.relname \nFROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace \nWHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.212355Z"}
+{"event": "[cached since 0.03124s ago] ('user_preferences', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')", "level": "info", "timestamp": "2026-06-14T09:44:19.212452Z"}
+{"event": "SELECT pg_catalog.pg_class.relname \nFROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace \nWHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.213194Z"}
+{"event": "[cached since 0.03206s ago] ('user_runtime_profiles', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')", "level": "info", "timestamp": "2026-06-14T09:44:19.213261Z"}
+{"event": "\nCREATE TABLE analytics_observations (\n\tid UUID NOT NULL, \n\tuser_id UUID NOT NULL, \n\tscope VARCHAR(64) NOT NULL, \n\tdescription TEXT NOT NULL, \n\tevidence TEXT, \n\tconfidence FLOAT NOT NULL, \n\timportance FLOAT NOT NULL, \n\tstability VARCHAR(32) NOT NULL, \n\tstatus VARCHAR(32) NOT NULL, \n\ttags JSON NOT NULL, \n\tvalid_until TIMESTAMP WITH TIME ZONE, \n\tsource VARCHAR(64) NOT NULL, \n\tsource_id VARCHAR(255), \n\tobserved_at TIMESTAMP WITH TIME ZONE NOT NULL, \n\tPRIMARY KEY (id)\n)\n\n", "level": "info", "timestamp": "2026-06-14T09:44:19.215497Z"}
+{"event": "[no key 0.00010s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.215564Z"}
+{"event": "CREATE INDEX ix_analytics_observations_user_id ON analytics_observations (user_id)", "level": "info", "timestamp": "2026-06-14T09:44:19.226838Z"}
+{"event": "[no key 0.00012s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.226918Z"}
+{"event": "CREATE INDEX ix_analytics_observations_importance ON analytics_observations (importance)", "level": "info", "timestamp": "2026-06-14T09:44:19.228791Z"}
+{"event": "[no key 0.00011s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.228877Z"}
+{"event": "CREATE INDEX ix_analytics_observations_scope ON analytics_observations (scope)", "level": "info", "timestamp": "2026-06-14T09:44:19.230509Z"}
+{"event": "[no key 0.00006s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.230562Z"}
+{"event": "CREATE INDEX ix_analytics_observations_observed_at ON analytics_observations (observed_at)", "level": "info", "timestamp": "2026-06-14T09:44:19.232689Z"}
+{"event": "[no key 0.00010s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.232777Z"}
+{"event": "CREATE INDEX ix_analytics_observations_source ON analytics_observations (source)", "level": "info", "timestamp": "2026-06-14T09:44:19.234907Z"}
+{"event": "[no key 0.00007s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.234963Z"}
+{"event": "CREATE INDEX ix_analytics_observations_status ON analytics_observations (status)", "level": "info", "timestamp": "2026-06-14T09:44:19.236421Z"}
+{"event": "[no key 0.00005s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.236462Z"}
+{"event": "CREATE INDEX ix_analytics_observations_source_id ON analytics_observations (source_id)", "level": "info", "timestamp": "2026-06-14T09:44:19.238269Z"}
+{"event": "[no key 0.00006s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.238320Z"}
+{"event": "CREATE INDEX ix_analytics_observations_confidence ON analytics_observations (confidence)", "level": "info", "timestamp": "2026-06-14T09:44:19.240189Z"}
+{"event": "[no key 0.00007s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.240243Z"}
+{"event": "CREATE INDEX ix_analytics_observations_stability ON analytics_observations (stability)", "level": "info", "timestamp": "2026-06-14T09:44:19.242157Z"}
+{"event": "[no key 0.00009s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.242222Z"}
+{"event": "\nCREATE TABLE analytics_insights (\n\tid UUID NOT NULL, \n\tuser_id UUID NOT NULL, \n\tscope VARCHAR(64) NOT NULL, \n\tdescription TEXT NOT NULL, \n\tevidence TEXT, \n\tconfidence FLOAT NOT NULL, \n\timportance FLOAT NOT NULL, \n\tstability VARCHAR(32) NOT NULL, \n\tstatus VARCHAR(32) NOT NULL, \n\ttags JSON NOT NULL, \n\tvalid_until TIMESTAMP WITH TIME ZONE, \n\tsource_observation_ids JSON NOT NULL, \n\tderived_at TIMESTAMP WITH TIME ZONE NOT NULL, \n\treplaced_by UUID, \n\tPRIMARY KEY (id)\n)\n\n", "level": "info", "timestamp": "2026-06-14T09:44:19.244785Z"}
+{"event": "[no key 0.00009s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.244846Z"}
+{"event": "CREATE INDEX ix_analytics_insights_replaced_by ON analytics_insights (replaced_by)", "level": "info", "timestamp": "2026-06-14T09:44:19.247935Z"}
+{"event": "[no key 0.00010s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.248011Z"}
+{"event": "CREATE INDEX ix_analytics_insights_user_id ON analytics_insights (user_id)", "level": "info", "timestamp": "2026-06-14T09:44:19.250074Z"}
+{"event": "[no key 0.00009s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.250147Z"}
+{"event": "CREATE INDEX ix_analytics_insights_importance ON analytics_insights (importance)", "level": "info", "timestamp": "2026-06-14T09:44:19.252018Z"}
+{"event": "[no key 0.00008s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.252079Z"}
+{"event": "CREATE INDEX ix_analytics_insights_scope ON analytics_insights (scope)", "level": "info", "timestamp": "2026-06-14T09:44:19.253726Z"}
+{"event": "[no key 0.00005s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.253769Z"}
+{"event": "CREATE INDEX ix_analytics_insights_status ON analytics_insights (status)", "level": "info", "timestamp": "2026-06-14T09:44:19.255373Z"}
+{"event": "[no key 0.00007s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.255429Z"}
+{"event": "CREATE INDEX ix_analytics_insights_stability ON analytics_insights (stability)", "level": "info", "timestamp": "2026-06-14T09:44:19.257207Z"}
+{"event": "[no key 0.00006s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.257260Z"}
+{"event": "CREATE INDEX ix_analytics_insights_confidence ON analytics_insights (confidence)", "level": "info", "timestamp": "2026-06-14T09:44:19.259432Z"}
+{"event": "[no key 0.00007s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.259524Z"}
+{"event": "CREATE INDEX ix_analytics_insights_derived_at ON analytics_insights (derived_at)", "level": "info", "timestamp": "2026-06-14T09:44:19.261803Z"}
+{"event": "[no key 0.00008s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.261860Z"}
+{"event": "\nCREATE TABLE courses (\n\tid UUID NOT NULL, \n\tuser_id UUID NOT NULL, \n\ttitle VARCHAR(255) NOT NULL, \n\tdescription TEXT, \n\tstatus VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (id)\n)\n\n", "level": "info", "timestamp": "2026-06-14T09:44:19.263586Z"}
+{"event": "[no key 0.00006s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.263633Z"}
+{"event": "CREATE INDEX ix_courses_status ON courses (status)", "level": "info", "timestamp": "2026-06-14T09:44:19.266824Z"}
+{"event": "[no key 0.00007s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.266896Z"}
+{"event": "CREATE INDEX ix_courses_user_id ON courses (user_id)", "level": "info", "timestamp": "2026-06-14T09:44:19.269980Z"}
+{"event": "[no key 0.00009s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.270048Z"}
+{"event": "\nCREATE TABLE runtime_jobs (\n\tid UUID NOT NULL, \n\tjob_type VARCHAR(64) NOT NULL, \n\tjob_key VARCHAR(128) NOT NULL, \n\tcron_expression VARCHAR(128) NOT NULL, \n\tstatus VARCHAR(32) NOT NULL, \n\tlast_run_at TIMESTAMP WITH TIME ZONE, \n\tlast_success_at TIMESTAMP WITH TIME ZONE, \n\tmetadata_json JSONB NOT NULL, \n\tPRIMARY KEY (id)\n)\n\n", "level": "info", "timestamp": "2026-06-14T09:44:19.271947Z"}
+{"event": "[no key 0.00006s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.271995Z"}
+{"event": "CREATE UNIQUE INDEX ix_runtime_jobs_job_key ON runtime_jobs (job_key)", "level": "info", "timestamp": "2026-06-14T09:44:19.275482Z"}
+{"event": "[no key 0.00008s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.275563Z"}
+{"event": "CREATE INDEX ix_runtime_jobs_status ON runtime_jobs (status)", "level": "info", "timestamp": "2026-06-14T09:44:19.277951Z"}
+{"event": "[no key 0.00009s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.278013Z"}
+{"event": "CREATE INDEX ix_runtime_jobs_job_type ON runtime_jobs (job_type)", "level": "info", "timestamp": "2026-06-14T09:44:19.279678Z"}
+{"event": "[no key 0.00009s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.279744Z"}
+{"event": "\nCREATE TABLE schedule_reminders (\n\tid UUID NOT NULL, \n\tuser_id UUID NOT NULL, \n\tremind_at TIMESTAMP WITHOUT TIME ZONE NOT NULL, \n\ttitle VARCHAR(255) NOT NULL, \n\tdescription TEXT, \n\tstatus VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (id)\n)\n\n", "level": "info", "timestamp": "2026-06-14T09:44:19.281346Z"}
+{"event": "[no key 0.00006s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.281391Z"}
+{"event": "CREATE INDEX ix_schedule_reminders_user_id ON schedule_reminders (user_id)", "level": "info", "timestamp": "2026-06-14T09:44:19.284842Z"}
+{"event": "[no key 0.00009s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.284905Z"}
+{"event": "CREATE INDEX ix_schedule_reminders_remind_at ON schedule_reminders (remind_at)", "level": "info", "timestamp": "2026-06-14T09:44:19.286868Z"}
+{"event": "[no key 0.00008s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.286931Z"}
+{"event": "CREATE INDEX ix_schedule_reminders_status ON schedule_reminders (status)", "level": "info", "timestamp": "2026-06-14T09:44:19.288481Z"}
+{"event": "[no key 0.00006s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.288533Z"}
+{"event": "\nCREATE TABLE schedule_deadlines (\n\tid UUID NOT NULL, \n\tuser_id UUID NOT NULL, \n\tdue_at TIMESTAMP WITHOUT TIME ZONE NOT NULL, \n\ttitle VARCHAR(255) NOT NULL, \n\tdescription TEXT, \n\tcourse_id UUID, \n\tcourse_task_id UUID, \n\tstatus VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (id)\n)\n\n", "level": "info", "timestamp": "2026-06-14T09:44:19.290315Z"}
+{"event": "[no key 0.00007s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.290374Z"}
+{"event": "CREATE INDEX ix_schedule_deadlines_course_id ON schedule_deadlines (course_id)", "level": "info", "timestamp": "2026-06-14T09:44:19.294065Z"}
+{"event": "[no key 0.00008s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.294124Z"}
+{"event": "CREATE INDEX ix_schedule_deadlines_due_at ON schedule_deadlines (due_at)", "level": "info", "timestamp": "2026-06-14T09:44:19.295821Z"}
+{"event": "[no key 0.00007s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.295881Z"}
+{"event": "CREATE INDEX ix_schedule_deadlines_course_task_id ON schedule_deadlines (course_task_id)", "level": "info", "timestamp": "2026-06-14T09:44:19.297756Z"}
+{"event": "[no key 0.00006s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.297807Z"}
+{"event": "CREATE INDEX ix_schedule_deadlines_user_id ON schedule_deadlines (user_id)", "level": "info", "timestamp": "2026-06-14T09:44:19.299838Z"}
+{"event": "[no key 0.00008s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.299904Z"}
+{"event": "CREATE INDEX ix_schedule_deadlines_status ON schedule_deadlines (status)", "level": "info", "timestamp": "2026-06-14T09:44:19.302386Z"}
+{"event": "[no key 0.00011s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.302459Z"}
+{"event": "\nCREATE TABLE weekly_schedule_templates (\n\tid UUID NOT NULL, \n\tuser_id UUID NOT NULL, \n\tPRIMARY KEY (id)\n)\n\n", "level": "info", "timestamp": "2026-06-14T09:44:19.304519Z"}
+{"event": "[no key 0.00005s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.304558Z"}
+{"event": "CREATE UNIQUE INDEX ix_weekly_schedule_templates_user_id ON weekly_schedule_templates (user_id)", "level": "info", "timestamp": "2026-06-14T09:44:19.306413Z"}
+{"event": "[no key 0.00012s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.306480Z"}
+{"event": "\nCREATE TABLE schedule_days (\n\tuser_id UUID NOT NULL, \n\tdate DATE NOT NULL, \n\ttitle VARCHAR(255) NOT NULL, \n\tdescription TEXT NOT NULL, \n\tPRIMARY KEY (user_id, date)\n)\n\n", "level": "info", "timestamp": "2026-06-14T09:44:19.308947Z"}
+{"event": "[no key 0.00007s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.309000Z"}
+{"event": "\nCREATE TABLE schedule_date_observations (\n\tid UUID NOT NULL, \n\tuser_id UUID NOT NULL, \n\tstarts_on DATE NOT NULL, \n\tends_on DATE, \n\tdescription TEXT NOT NULL, \n\tPRIMARY KEY (id)\n)\n\n", "level": "info", "timestamp": "2026-06-14T09:44:19.311975Z"}
+{"event": "[no key 0.00010s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.312043Z"}
+{"event": "CREATE INDEX ix_schedule_date_observations_ends_on ON schedule_date_observations (ends_on)", "level": "info", "timestamp": "2026-06-14T09:44:19.314527Z"}
+{"event": "[no key 0.00009s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.314586Z"}
+{"event": "CREATE INDEX ix_schedule_date_observations_starts_on ON schedule_date_observations (starts_on)", "level": "info", "timestamp": "2026-06-14T09:44:19.316490Z"}
+{"event": "[no key 0.00006s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.316536Z"}
+{"event": "CREATE INDEX ix_schedule_date_observations_user_id ON schedule_date_observations (user_id)", "level": "info", "timestamp": "2026-06-14T09:44:19.318609Z"}
+{"event": "[no key 0.00010s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.318681Z"}
+{"event": "\nCREATE TABLE users (\n\tid UUID NOT NULL, \n\tlogin VARCHAR(128), \n\tname VARCHAR(255), \n\tpassword_hash VARCHAR(512) NOT NULL, \n\trole VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (id)\n)\n\n", "level": "info", "timestamp": "2026-06-14T09:44:19.320285Z"}
+{"event": "[no key 0.00007s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.320371Z"}
+{"event": "CREATE UNIQUE INDEX ix_users_login ON users (login)", "level": "info", "timestamp": "2026-06-14T09:44:19.323290Z"}
+{"event": "[no key 0.00010s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.323365Z"}
+{"event": "\nCREATE TABLE course_tasks (\n\tid UUID NOT NULL, \n\tcourse_id UUID NOT NULL, \n\ttitle VARCHAR(255) NOT NULL, \n\tdescription TEXT, \n\tpriority INTEGER NOT NULL, \n\tstatus VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(course_id) REFERENCES courses (id) ON DELETE CASCADE\n)\n\n", "level": "info", "timestamp": "2026-06-14T09:44:19.326067Z"}
+{"event": "[no key 0.00010s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.326134Z"}
+{"event": "CREATE INDEX ix_course_tasks_status ON course_tasks (status)", "level": "info", "timestamp": "2026-06-14T09:44:19.331572Z"}
+{"event": "[no key 0.00011s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.331694Z"}
+{"event": "CREATE INDEX ix_course_tasks_course_id ON course_tasks (course_id)", "level": "info", "timestamp": "2026-06-14T09:44:19.334430Z"}
+{"event": "[no key 0.00010s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.334500Z"}
+{"event": "\nCREATE TABLE course_observations (\n\tid UUID NOT NULL, \n\tcourse_id UUID NOT NULL, \n\ttitle VARCHAR(255) NOT NULL, \n\tdescription TEXT, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(course_id) REFERENCES courses (id) ON DELETE CASCADE\n)\n\n", "level": "info", "timestamp": "2026-06-14T09:44:19.336431Z"}
+{"event": "[no key 0.00008s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.336490Z"}
+{"event": "CREATE INDEX ix_course_observations_course_id ON course_observations (course_id)", "level": "info", "timestamp": "2026-06-14T09:44:19.340282Z"}
+{"event": "[no key 0.00009s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.340365Z"}
+{"event": "\nCREATE TABLE runtime_job_executions (\n\tid UUID NOT NULL, \n\tjob_id UUID NOT NULL, \n\tsource VARCHAR(32) NOT NULL, \n\tstatus VARCHAR(32) NOT NULL, \n\tstarted_at TIMESTAMP WITH TIME ZONE NOT NULL, \n\tfinished_at TIMESTAMP WITH TIME ZONE, \n\tmetadata_json JSONB NOT NULL, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(job_id) REFERENCES runtime_jobs (id) ON DELETE CASCADE\n)\n\n", "level": "info", "timestamp": "2026-06-14T09:44:19.342822Z"}
+{"event": "[no key 0.00009s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.342890Z"}
+{"event": "CREATE INDEX ix_runtime_job_executions_status ON runtime_job_executions (status)", "level": "info", "timestamp": "2026-06-14T09:44:19.345782Z"}
+{"event": "[no key 0.00008s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.345841Z"}
+{"event": "CREATE INDEX ix_runtime_job_executions_source ON runtime_job_executions (source)", "level": "info", "timestamp": "2026-06-14T09:44:19.347590Z"}
+{"event": "[no key 0.00006s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.347638Z"}
+{"event": "CREATE INDEX ix_runtime_job_executions_job_id ON runtime_job_executions (job_id)", "level": "info", "timestamp": "2026-06-14T09:44:19.349630Z"}
+{"event": "[no key 0.00009s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.349700Z"}
+{"event": "CREATE INDEX ix_runtime_job_executions_started_at ON runtime_job_executions (started_at)", "level": "info", "timestamp": "2026-06-14T09:44:19.351777Z"}
+{"event": "[no key 0.00010s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.351850Z"}
+{"event": "\nCREATE TABLE schedule_day_templates (\n\tweekly_schedule_template_id UUID NOT NULL, \n\tweekday VARCHAR(16) NOT NULL, \n\tPRIMARY KEY (weekly_schedule_template_id, weekday), \n\tFOREIGN KEY(weekly_schedule_template_id) REFERENCES weekly_schedule_templates (id) ON DELETE CASCADE\n)\n\n", "level": "info", "timestamp": "2026-06-14T09:44:19.353548Z"}
+{"event": "[no key 0.00007s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.353635Z"}
+{"event": "\nCREATE TABLE weekly_schedule_observations (\n\tid UUID NOT NULL, \n\tweekly_schedule_template_id UUID NOT NULL, \n\tdescription TEXT NOT NULL, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(weekly_schedule_template_id) REFERENCES weekly_schedule_templates (id) ON DELETE CASCADE\n)\n\n", "level": "info", "timestamp": "2026-06-14T09:44:19.355848Z"}
+{"event": "[no key 0.00007s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.355904Z"}
+{"event": "CREATE INDEX ix_weekly_schedule_observations_weekly_schedule_template_id ON weekly_schedule_observations (weekly_schedule_template_id)", "level": "info", "timestamp": "2026-06-14T09:44:19.359358Z"}
+{"event": "[no key 0.00009s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.359427Z"}
+{"event": "\nCREATE TABLE scheduled_blocks (\n\tid UUID NOT NULL, \n\tuser_id UUID NOT NULL, \n\tdate DATE NOT NULL, \n\tstart_time VARCHAR(5) NOT NULL, \n\tend_time VARCHAR(5) NOT NULL, \n\tkind VARCHAR(32) NOT NULL, \n\ttitle VARCHAR(255) NOT NULL, \n\tdescription TEXT, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(user_id, date) REFERENCES schedule_days (user_id, date) ON DELETE CASCADE\n)\n\n", "level": "info", "timestamp": "2026-06-14T09:44:19.361183Z"}
+{"event": "[no key 0.00006s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.361235Z"}
+{"event": "CREATE INDEX ix_scheduled_blocks_user_id ON scheduled_blocks (user_id)", "level": "info", "timestamp": "2026-06-14T09:44:19.364282Z"}
+{"event": "[no key 0.00010s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.364354Z"}
+{"event": "CREATE INDEX ix_scheduled_blocks_kind ON scheduled_blocks (kind)", "level": "info", "timestamp": "2026-06-14T09:44:19.366243Z"}
+{"event": "[no key 0.00008s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.366303Z"}
+{"event": "CREATE INDEX ix_scheduled_blocks_date ON scheduled_blocks (date)", "level": "info", "timestamp": "2026-06-14T09:44:19.368483Z"}
+{"event": "[no key 0.00009s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.368552Z"}
+{"event": "\nCREATE TABLE scheduled_activities (\n\tid UUID NOT NULL, \n\tuser_id UUID NOT NULL, \n\tdate DATE NOT NULL, \n\tstart_time VARCHAR(5) NOT NULL, \n\tend_time VARCHAR(5) NOT NULL, \n\ttitle VARCHAR(255) NOT NULL, \n\tdescription TEXT, \n\tcourse_task_id UUID, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(user_id, date) REFERENCES schedule_days (user_id, date) ON DELETE CASCADE\n)\n\n", "level": "info", "timestamp": "2026-06-14T09:44:19.370374Z"}
+{"event": "[no key 0.00007s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.370430Z"}
+{"event": "CREATE INDEX ix_scheduled_activities_date ON scheduled_activities (date)", "level": "info", "timestamp": "2026-06-14T09:44:19.373451Z"}
+{"event": "[no key 0.00008s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.373510Z"}
+{"event": "CREATE INDEX ix_scheduled_activities_user_id ON scheduled_activities (user_id)", "level": "info", "timestamp": "2026-06-14T09:44:19.375497Z"}
+{"event": "[no key 0.00009s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.375568Z"}
+{"event": "CREATE INDEX ix_scheduled_activities_course_task_id ON scheduled_activities (course_task_id)", "level": "info", "timestamp": "2026-06-14T09:44:19.377115Z"}
+{"event": "[no key 0.00005s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.377160Z"}
+{"event": "\nCREATE TABLE schedule_day_observations (\n\tid UUID NOT NULL, \n\tuser_id UUID NOT NULL, \n\tdate DATE NOT NULL, \n\tdescription TEXT NOT NULL, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(user_id, date) REFERENCES schedule_days (user_id, date) ON DELETE CASCADE\n)\n\n", "level": "info", "timestamp": "2026-06-14T09:44:19.378830Z"}
+{"event": "[no key 0.00007s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.378881Z"}
+{"event": "CREATE INDEX ix_schedule_day_observations_user_id ON schedule_day_observations (user_id)", "level": "info", "timestamp": "2026-06-14T09:44:19.381564Z"}
+{"event": "[no key 0.00008s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.381626Z"}
+{"event": "CREATE INDEX ix_schedule_day_observations_date ON schedule_day_observations (date)", "level": "info", "timestamp": "2026-06-14T09:44:19.383396Z"}
+{"event": "[no key 0.00008s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.383456Z"}
+{"event": "\nCREATE TABLE user_preferences (\n\tuser_id UUID NOT NULL, \n\tlanguage VARCHAR(16) NOT NULL, \n\tutc_offset_minutes INTEGER NOT NULL, \n\tregion VARCHAR(16), \n\tPRIMARY KEY (user_id), \n\tFOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE\n)\n\n", "level": "info", "timestamp": "2026-06-14T09:44:19.385903Z"}
+{"event": "[no key 0.00010s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.385975Z"}
+{"event": "\nCREATE TABLE user_runtime_profiles (\n\tuser_id UUID NOT NULL, \n\tstatus VARCHAR(32) NOT NULL, \n\tlast_session_at TIMESTAMP WITHOUT TIME ZONE, \n\tPRIMARY KEY (user_id), \n\tFOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE\n)\n\n", "level": "info", "timestamp": "2026-06-14T09:44:19.388378Z"}
+{"event": "[no key 0.00008s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.388437Z"}
+{"event": "\nCREATE TABLE course_task_observations (\n\tid UUID NOT NULL, \n\ttask_id UUID NOT NULL, \n\ttitle VARCHAR(255) NOT NULL, \n\tdescription TEXT, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(task_id) REFERENCES course_tasks (id) ON DELETE CASCADE\n)\n\n", "level": "info", "timestamp": "2026-06-14T09:44:19.390549Z"}
+{"event": "[no key 0.00007s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.390605Z"}
+{"event": "CREATE INDEX ix_course_task_observations_task_id ON course_task_observations (task_id)", "level": "info", "timestamp": "2026-06-14T09:44:19.394137Z"}
+{"event": "[no key 0.00010s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.394207Z"}
+{"event": "\nCREATE TABLE schedule_template_time_blocks (\n\tid UUID NOT NULL, \n\tweekly_schedule_template_id UUID NOT NULL, \n\tweekday VARCHAR(16) NOT NULL, \n\tstart_time VARCHAR(5) NOT NULL, \n\tend_time VARCHAR(5) NOT NULL, \n\tkind VARCHAR(32) NOT NULL, \n\ttitle VARCHAR(255) NOT NULL, \n\tdescription TEXT, \n\tPRIMARY KEY (id), \n\tFOREIGN KEY(weekly_schedule_template_id, weekday) REFERENCES schedule_day_templates (weekly_schedule_template_id, weekday) ON DELETE CASCADE\n)\n\n", "level": "info", "timestamp": "2026-06-14T09:44:19.395863Z"}
+{"event": "[no key 0.00008s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.395924Z"}
+{"event": "CREATE INDEX ix_schedule_template_time_blocks_weekly_schedule_template_id ON schedule_template_time_blocks (weekly_schedule_template_id)", "level": "info", "timestamp": "2026-06-14T09:44:19.399439Z"}
+{"event": "[no key 0.00009s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.399546Z"}
+{"event": "CREATE INDEX ix_schedule_template_time_blocks_weekday ON schedule_template_time_blocks (weekday)", "level": "info", "timestamp": "2026-06-14T09:44:19.401740Z"}
+{"event": "[no key 0.00009s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.401807Z"}
+{"event": "CREATE INDEX ix_schedule_template_time_blocks_kind ON schedule_template_time_blocks (kind)", "level": "info", "timestamp": "2026-06-14T09:44:19.403480Z"}
+{"event": "[no key 0.00005s] ()", "level": "info", "timestamp": "2026-06-14T09:44:19.403523Z"}
+{"event": "COMMIT", "level": "info", "timestamp": "2026-06-14T09:44:19.405123Z"}
+{"event": "backend_database_schema_ensured", "level": "info", "timestamp": "2026-06-14T09:44:19.406575Z"}
+{"event": "api_scheduler_direttore_bound", "level": "info", "timestamp": "2026-06-14T09:44:19.406684Z"}
+{"event": "BEGIN (implicit)", "level": "info", "timestamp": "2026-06-14T09:44:19.407504Z"}
+{"event": "SELECT runtime_jobs.id, runtime_jobs.job_type, runtime_jobs.job_key, runtime_jobs.cron_expression, runtime_jobs.status, runtime_jobs.last_run_at, runtime_jobs.last_success_at, runtime_jobs.metadata_json \nFROM runtime_jobs \nWHERE runtime_jobs.job_key = $1::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.411847Z"}
+{"event": "[generated in 0.00013s] ('close_sessions:daily',)", "level": "info", "timestamp": "2026-06-14T09:44:19.411919Z"}
+{"event": "Adding job tentatively -- it will be properly scheduled when the scheduler starts", "level": "info", "timestamp": "2026-06-14T09:44:19.414917Z"}
+{"operation_key": "close_sessions:daily", "handler_key": "runtime.close_active_sessions", "cron_expression": "0 0 * * *", "owner_user_id": null, "event": "api_scheduler_cron_operation_scheduled", "level": "info", "timestamp": "2026-06-14T09:44:19.414969Z"}
+{"event": "INSERT INTO runtime_jobs (id, job_type, job_key, cron_expression, status, last_run_at, last_success_at, metadata_json) VALUES ($1::UUID, $2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::TIMESTAMP WITH TIME ZONE, $7::TIMESTAMP WITH TIME ZONE, $8::JSONB)", "level": "info", "timestamp": "2026-06-14T09:44:19.415939Z"}
+{"event": "[generated in 0.00014s] (UUID('439e895a-686c-4eb1-a00d-3b334ef844bd'), 'close_sessions', 'close_sessions:daily', '0 0 * * *', 'enabled', None, None, '{}')", "level": "info", "timestamp": "2026-06-14T09:44:19.415995Z"}
+{"event": "SELECT runtime_jobs.id, runtime_jobs.job_type, runtime_jobs.job_key, runtime_jobs.cron_expression, runtime_jobs.status, runtime_jobs.last_run_at, runtime_jobs.last_success_at, runtime_jobs.metadata_json \nFROM runtime_jobs \nWHERE runtime_jobs.job_key = $1::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.418533Z"}
+{"event": "[cached since 0.006816s ago] ('batch_observations:daily',)", "level": "info", "timestamp": "2026-06-14T09:44:19.418608Z"}
+{"event": "Adding job tentatively -- it will be properly scheduled when the scheduler starts", "level": "info", "timestamp": "2026-06-14T09:44:19.419494Z"}
+{"operation_key": "batch_observations:daily", "handler_key": "runtime.batch_observations", "cron_expression": "0 2 * * *", "owner_user_id": null, "event": "api_scheduler_cron_operation_scheduled", "level": "info", "timestamp": "2026-06-14T09:44:19.419529Z"}
+{"event": "INSERT INTO runtime_jobs (id, job_type, job_key, cron_expression, status, last_run_at, last_success_at, metadata_json) VALUES ($1::UUID, $2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::TIMESTAMP WITH TIME ZONE, $7::TIMESTAMP WITH TIME ZONE, $8::JSONB)", "level": "info", "timestamp": "2026-06-14T09:44:19.419782Z"}
+{"event": "[cached since 0.003995s ago] (UUID('fe2110ef-d9bb-4171-a726-84aa41837023'), 'batch_observations', 'batch_observations:daily', '0 2 * * *', 'enabled', None, None, '{}')", "level": "info", "timestamp": "2026-06-14T09:44:19.419853Z"}
+{"event": "SELECT runtime_jobs.id, runtime_jobs.job_type, runtime_jobs.job_key, runtime_jobs.cron_expression, runtime_jobs.status, runtime_jobs.last_run_at, runtime_jobs.last_success_at, runtime_jobs.metadata_json \nFROM runtime_jobs \nWHERE runtime_jobs.job_key = $1::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.420522Z"}
+{"event": "[cached since 0.00878s ago] ('generate_day:daily',)", "level": "info", "timestamp": "2026-06-14T09:44:19.420569Z"}
+{"event": "Adding job tentatively -- it will be properly scheduled when the scheduler starts", "level": "info", "timestamp": "2026-06-14T09:44:19.421228Z"}
+{"operation_key": "generate_day:daily", "handler_key": "runtime.generate_day", "cron_expression": "0 3 * * *", "owner_user_id": null, "event": "api_scheduler_cron_operation_scheduled", "level": "info", "timestamp": "2026-06-14T09:44:19.421254Z"}
+{"event": "INSERT INTO runtime_jobs (id, job_type, job_key, cron_expression, status, last_run_at, last_success_at, metadata_json) VALUES ($1::UUID, $2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::TIMESTAMP WITH TIME ZONE, $7::TIMESTAMP WITH TIME ZONE, $8::JSONB)", "level": "info", "timestamp": "2026-06-14T09:44:19.421447Z"}
+{"event": "[cached since 0.005634s ago] (UUID('3a66d0f0-67e7-41de-aa23-4c98de8af4cf'), 'generate_day', 'generate_day:daily', '0 3 * * *', 'enabled', None, None, '{}')", "level": "info", "timestamp": "2026-06-14T09:44:19.421486Z"}
+{"event": "SELECT runtime_jobs.id, runtime_jobs.job_type, runtime_jobs.job_key, runtime_jobs.cron_expression, runtime_jobs.status, runtime_jobs.last_run_at, runtime_jobs.last_success_at, runtime_jobs.metadata_json \nFROM runtime_jobs \nWHERE runtime_jobs.job_key = $1::VARCHAR", "level": "info", "timestamp": "2026-06-14T09:44:19.422054Z"}
+{"event": "[cached since 0.01031s ago] ('morning_delivery:daily',)", "level": "info", "timestamp": "2026-06-14T09:44:19.422095Z"}
+{"event": "Adding job tentatively -- it will be properly scheduled when the scheduler starts", "level": "info", "timestamp": "2026-06-14T09:44:19.422766Z"}
+{"operation_key": "morning_delivery:daily", "handler_key": "runtime.morning_delivery", "cron_expression": "0 6 * * *", "owner_user_id": null, "event": "api_scheduler_cron_operation_scheduled", "level": "info", "timestamp": "2026-06-14T09:44:19.422791Z"}
+{"created_count": 4, "existing_count": 0, "scheduled_count": 4, "register_scheduler_jobs": true, "event": "runtime_jobs_ensured", "level": "info", "timestamp": "2026-06-14T09:44:19.422848Z"}
+{"event": "INSERT INTO runtime_jobs (id, job_type, job_key, cron_expression, status, last_run_at, last_success_at, metadata_json) VALUES ($1::UUID, $2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::TIMESTAMP WITH TIME ZONE, $7::TIMESTAMP WITH TIME ZONE, $8::JSONB)", "level": "info", "timestamp": "2026-06-14T09:44:19.423116Z"}
+{"event": "[cached since 0.007322s ago] (UUID('b05e576d-7f83-46b7-8e44-0fc7a7fe0be0'), 'morning_delivery', 'morning_delivery:daily', '0 6 * * *', 'enabled', None, None, '{}')", "level": "info", "timestamp": "2026-06-14T09:44:19.423181Z"}
+{"event": "COMMIT", "level": "info", "timestamp": "2026-06-14T09:44:19.423929Z"}
+{"event": "backend_runtime_jobs_ensured", "level": "info", "timestamp": "2026-06-14T09:44:19.424868Z"}
+{"event": "Added job \"api-cron-operation:runtime.close_active_sessions:close_sessions:daily\" to job store \"default\"", "level": "info", "timestamp": "2026-06-14T09:44:19.426468Z"}
+{"event": "Added job \"api-cron-operation:runtime.batch_observations:batch_observations:daily\" to job store \"default\"", "level": "info", "timestamp": "2026-06-14T09:44:19.426558Z"}
+{"event": "Added job \"api-cron-operation:runtime.generate_day:generate_day:daily\" to job store \"default\"", "level": "info", "timestamp": "2026-06-14T09:44:19.426623Z"}
+{"event": "Added job \"api-cron-operation:runtime.morning_delivery:morning_delivery:daily\" to job store \"default\"", "level": "info", "timestamp": "2026-06-14T09:44:19.426676Z"}
+{"event": "Scheduler started", "level": "info", "timestamp": "2026-06-14T09:44:19.426703Z"}
+{"event": "backend_started", "level": "info", "timestamp": "2026-06-14T09:44:19.426736Z"}
+{"event": "Looking for jobs to run", "level": "debug", "timestamp": "2026-06-14T09:44:19.426828Z"}
+{"event": "Next wakeup is due at 2026-06-15 00:00:00+00:00 (in 51340.573151 seconds)", "level": "debug", "timestamp": "2026-06-14T09:44:19.426868Z"}
+INFO:     Application startup complete.

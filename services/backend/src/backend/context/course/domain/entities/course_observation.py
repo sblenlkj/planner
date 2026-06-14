@@ -12,7 +12,7 @@ class CourseObservation(Validatable):
     id: UUID
     course_id: UUID
     title: str
-    description: str
+    description: str | None = None
 
     @classmethod
     def create(
@@ -20,7 +20,7 @@ class CourseObservation(Validatable):
         *,
         course_id: UUID,
         title: str,
-        description: str,
+        description: str | None = None,
         id: UUID | None = None,
     ) -> "CourseObservation":
         return cls(
@@ -30,18 +30,11 @@ class CourseObservation(Validatable):
                 title,
                 "Course observation title",
             ),
-            description=cls._normalize_required_text(
-                description,
-                "Course observation description",
-            ),
+            description=cls._normalize_optional_text(description),
         )
 
     def validate_invariants(self) -> Self:
         self._validate_required_text(self.title, "Course observation title")
-        self._validate_required_text(
-            self.description,
-            "Course observation description",
-        )
         return self
 
     def rename(self, title: str) -> None:
@@ -50,17 +43,22 @@ class CourseObservation(Validatable):
             "Course observation title",
         )
 
-    def change_description(self, description: str) -> None:
-        self.description = self._normalize_required_text(
-            description,
-            "Course observation description",
-        )
+    def change_description(self, description: str | None) -> None:
+        self.description = self._normalize_optional_text(description)
 
     @classmethod
     def _normalize_required_text(cls, value: str, field_name: str) -> str:
         value = value.strip()
         cls._validate_required_text(value, field_name)
         return value
+
+    @staticmethod
+    def _normalize_optional_text(value: str | None) -> str | None:
+        if value is None:
+            return None
+
+        normalized = value.strip()
+        return normalized or None
 
     @staticmethod
     def _validate_required_text(value: str, field_name: str) -> None:

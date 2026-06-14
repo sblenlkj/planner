@@ -34,6 +34,9 @@ class Reminder:
     def reactivate(self) -> None:
         self.status = CommitmentStatus.ACTIVE
 
+    def expire(self) -> None:
+        self.status = CommitmentStatus.EXPIRED
+
     def reschedule(self, remind_at: datetime) -> None:
         self._validate_utc_datetime(remind_at, field_name="remind_at")
         self.remind_at = remind_at

@@ -16,7 +16,7 @@ from backend.context.course.domain.value_objects import (
 class Course(SimpleAggregateRoot, Validatable):
     user_id: UUID
     title: str
-    description: str
+    description: str | None = None
     status: CourseStatus = CourseStatus.ACTIVE
 
     @classmethod
@@ -25,33 +25,26 @@ class Course(SimpleAggregateRoot, Validatable):
         *,
         user_id: UUID,
         title: str,
-        description: str,
+        description: str | None = None,
         id: UUID | None = None,
     ) -> "Course":
         return cls(
             id=id or uuid4(),
             user_id=user_id,
             title=cls._normalize_required_text(title, "Course title"),
-            description=cls._normalize_required_text(
-                description,
-                "Course description",
-            ),
+            description=cls._normalize_optional_text(description),
             status=CourseStatus.ACTIVE,
         )
 
     def validate_invariants(self) -> Self:
         self._validate_required_text(self.title, "Course title")
-        self._validate_required_text(self.description, "Course description")
         return self
 
     def rename(self, title: str) -> None:
         self.title = self._normalize_required_text(title, "Course title")
 
-    def change_description(self, description: str) -> None:
-        self.description = self._normalize_required_text(
-            description,
-            "Course description",
-        )
+    def change_description(self, description: str | None) -> None:
+        self.description = self._normalize_optional_text(description)
 
     def complete(self) -> None:
         self.status = transition_course_status(
@@ -76,6 +69,14 @@ class Course(SimpleAggregateRoot, Validatable):
         value = value.strip()
         cls._validate_required_text(value, field_name)
         return value
+
+    @staticmethod
+    def _normalize_optional_text(value: str | None) -> str | None:
+        if value is None:
+            return None
+
+        normalized = value.strip()
+        return normalized or None
 
     @staticmethod
     def _validate_required_text(value: str, field_name: str) -> None:

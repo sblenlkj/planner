@@ -3,14 +3,17 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from uuid import UUID
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
+DEFAULT_USER_LANGUAGE = "en"
+MIN_UTC_OFFSET_MINUTES = -12 * 60
+MAX_UTC_OFFSET_MINUTES = 14 * 60
 
 
 @dataclass(slots=True)
 class UserPreferences:
     user_id: UUID
     language: str
-    timezone: str
+    utc_offset_minutes: int
     region: str | None = None
 
     @classmethod
@@ -18,42 +21,36 @@ class UserPreferences:
         cls,
         *,
         user_id: UUID,
-        language: str,
-        timezone: str,
+        utc_offset_minutes: int,
+        language: str | None = None,
         region: str | None = None,
     ) -> "UserPreferences":
         return cls(
             user_id=user_id,
-            language=language,
-            timezone=timezone,
+            language=language or DEFAULT_USER_LANGUAGE,
+            utc_offset_minutes=utc_offset_minutes,
             region=region,
         )
 
     def __post_init__(self) -> None:
-        self.language = self.language.strip().lower()
-        self.timezone = self.timezone.strip()
-        self.region = self.region.strip().upper() if self.region else None
-
-        self._validate_language(self.language)
-        self._validate_timezone(self.timezone)
+        self.language = self._normalize_language(self.language)
+        self.region = self._normalize_region(self.region)
+        self._validate_utc_offset_minutes(self.utc_offset_minutes)
 
     def change_language(self, language: str) -> None:
-        language = language.strip().lower()
+        self.language = self._normalize_language(language)
 
-        self._validate_language(language)
-        self.language = language
-
-    def change_timezone(self, timezone: str) -> None:
-        timezone = timezone.strip()
-
-        self._validate_timezone(timezone)
-        self.timezone = timezone
+    def change_utc_offset_minutes(self, utc_offset_minutes: int) -> None:
+        self._validate_utc_offset_minutes(utc_offset_minutes)
+        self.utc_offset_minutes = utc_offset_minutes
 
     def change_region(self, region: str | None) -> None:
-        self.region = region.strip().upper() if region else None
+        self.region = self._normalize_region(region)
 
     @staticmethod
-    def _validate_language(language: str) -> None:
+    def _normalize_language(language: str) -> str:
+        language = language.strip().lower()
+
         if not language:
             raise ValueError("User language is required.")
 
@@ -62,12 +59,25 @@ class UserPreferences:
                 "User language must look like 'en', 'ru', 'it', 'he', or 'en-us'."
             )
 
-    @staticmethod
-    def _validate_timezone(timezone: str) -> None:
-        if not timezone:
-            raise ValueError("User timezone is required.")
+        return language
 
-        try:
-            ZoneInfo(timezone)
-        except ZoneInfoNotFoundError as exc:
-            raise ValueError(f"Unknown user timezone: {timezone}") from exc
+    @staticmethod
+    def _normalize_region(region: str | None) -> str | None:
+        if region is None:
+            return None
+
+        region = region.strip().upper()
+        return region or None
+
+    @staticmethod
+    def _validate_utc_offset_minutes(utc_offset_minutes: int) -> None:
+        if not isinstance(utc_offset_minutes, int):
+            raise ValueError("User UTC offset must be an integer number of minutes.")
+
+        if (
+            utc_offset_minutes < MIN_UTC_OFFSET_MINUTES
+            or utc_offset_minutes > MAX_UTC_OFFSET_MINUTES
+        ):
+            raise ValueError(
+                "User UTC offset must be between UTC-12:00 and UTC+14:00."
+            )

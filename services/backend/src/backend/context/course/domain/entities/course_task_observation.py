@@ -6,16 +6,13 @@ from uuid import UUID, uuid4
 
 from direttore import Validatable
 
-from backend.context.course.domain.value_objects import CourseTaskProgress
-
 
 @dataclass(eq=False, kw_only=True)
 class CourseTaskObservation(Validatable):
     id: UUID
     task_id: UUID
     title: str
-    description: str
-    progress: CourseTaskProgress | None = None
+    description: str | None = None
 
     @classmethod
     def create(
@@ -23,8 +20,7 @@ class CourseTaskObservation(Validatable):
         *,
         task_id: UUID,
         title: str,
-        description: str,
-        progress: CourseTaskProgress | None = None,
+        description: str | None = None,
         id: UUID | None = None,
     ) -> "CourseTaskObservation":
         return cls(
@@ -34,21 +30,13 @@ class CourseTaskObservation(Validatable):
                 title,
                 "Course task observation title",
             ),
-            description=cls._normalize_required_text(
-                description,
-                "Course task observation description",
-            ),
-            progress=progress,
+            description=cls._normalize_optional_text(description),
         )
 
     def validate_invariants(self) -> Self:
         self._validate_required_text(
             self.title,
             "Course task observation title",
-        )
-        self._validate_required_text(
-            self.description,
-            "Course task observation description",
         )
         return self
 
@@ -58,20 +46,22 @@ class CourseTaskObservation(Validatable):
             "Course task observation title",
         )
 
-    def change_description(self, description: str) -> None:
-        self.description = self._normalize_required_text(
-            description,
-            "Course task observation description",
-        )
-
-    def change_progress(self, progress: CourseTaskProgress | None) -> None:
-        self.progress = progress
+    def change_description(self, description: str | None) -> None:
+        self.description = self._normalize_optional_text(description)
 
     @classmethod
     def _normalize_required_text(cls, value: str, field_name: str) -> str:
         value = value.strip()
         cls._validate_required_text(value, field_name)
         return value
+
+    @staticmethod
+    def _normalize_optional_text(value: str | None) -> str | None:
+        if value is None:
+            return None
+
+        normalized = value.strip()
+        return normalized or None
 
     @staticmethod
     def _validate_required_text(value: str, field_name: str) -> None:

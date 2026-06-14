@@ -4,68 +4,114 @@ from dataclasses import dataclass
 from enum import StrEnum
 from uuid import UUID, uuid4
 
+from backend.shared.application import ADMIN_ACCESS_TAG, USER_ACCESS_TAG
 
-class UserStatus(StrEnum):
-    ACTIVE = "active"
-    DISABLED = "disabled"
+
+class UserRole(StrEnum):
+    USER = USER_ACCESS_TAG
+    ADMIN = ADMIN_ACCESS_TAG
 
 
 @dataclass(slots=True)
 class User:
     id: UUID
-    email: str
-    name: str
-    status: UserStatus = UserStatus.ACTIVE
+    password_hash: str
+    login: str | None = None
+    name: str | None = None
+    role: UserRole = UserRole.USER
 
     @classmethod
-    def create(
+    def create_user(
         cls,
         *,
-        email: str,
-        name: str,
+        password_hash: str,
+        login: str | None = None,
+        name: str | None = None,
         id: UUID | None = None,
     ) -> "User":
         return cls(
             id=id or uuid4(),
-            email=email,
+            login=login,
             name=name,
-            status=UserStatus.ACTIVE,
+            password_hash=password_hash,
+            role=UserRole.USER,
+        )
+
+    @classmethod
+    def create_admin(
+        cls,
+        *,
+        login: str,
+        name: str,
+        password_hash: str,
+        id: UUID | None = None,
+    ) -> "User":
+        login = cls._normalize_required_text(login, "Admin login")
+        name = cls._normalize_required_text(name, "Admin name")
+
+        return cls(
+            id=id or uuid4(),
+            login=login,
+            name=name,
+            password_hash=password_hash,
+            role=UserRole.ADMIN,
         )
 
     def __post_init__(self) -> None:
-        self.email = self.email.strip().lower()
-        self.name = self.name.strip()
+        self.login = self._normalize_login(self.login)
+        self.name = self._normalize_optional_text(self.name)
+        self.password_hash = self.password_hash.strip()
 
-        if not self.email:
-            raise ValueError("User email is required.")
+        if not self.password_hash:
+            raise ValueError("User password hash is required.")
 
-        if "@" not in self.email:
-            raise ValueError("User email must contain '@'.")
+        if self.role == UserRole.ADMIN:
+            self.login = self._normalize_required_text(self.login, "Admin login")
+            self.name = self._normalize_required_text(self.name, "Admin name")
 
-        if not self.name:
-            raise ValueError("User name is required.")
+    def rename(self, name: str | None) -> None:
+        self.name = self._normalize_optional_text(name)
 
-    def rename(self, name: str) -> None:
-        name = name.strip()
+    def change_login(self, login: str | None) -> None:
+        self.login = self._normalize_login(login)
 
-        if not name:
-            raise ValueError("User name is required.")
+    def change_password_hash(self, password_hash: str) -> None:
+        password_hash = password_hash.strip()
 
-        self.name = name
+        if not password_hash:
+            raise ValueError("User password hash is required.")
 
-    def change_email(self, email: str) -> None:
-        email = email.strip().lower()
+        self.password_hash = password_hash
 
-        if not email:
-            raise ValueError("User email is required.")
+    @property
+    def is_admin(self) -> bool:
+        return self.role == UserRole.ADMIN
 
-        if "@" not in email:
-            raise ValueError("User email must contain '@'.")
+    @property
+    def is_regular_user(self) -> bool:
+        return self.role == UserRole.USER
 
-        self.email = email
+    @staticmethod
+    def _normalize_login(login: str | None) -> str | None:
+        if login is None:
+            return None
 
-    def disable(self) -> None:
-        self.status = UserStatus.DISABLED
+        login = login.strip().lower()
+        return login or None
 
-    def activate(self) -> None:
-        self.status = UserStatus.ACTIVE
+    @staticmethod
+    def _normalize_optional_text(value: str | None) -> str | None:
+        if value is None:
+            return None
+
+        value = value.strip()
+        return value or None
+
+    @classmethod
+    def _normalize_required_text(cls, value: str | None, field_name: str) -> str:
+        value = cls._normalize_optional_text(value)
+
+        if value is None:
+            raise ValueError(f"{field_name} is required.")
+
+        return value
