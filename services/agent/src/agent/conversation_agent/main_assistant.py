@@ -40,7 +40,6 @@ async def run_main_assistant_agent(
 
     tools = build_planner_tools(
         execution_context=execution_context,
-        planner_context=planner_context,
         course_context=course_context,
         schedule_context=schedule_context,
         analytics_context=analytics_context,
@@ -121,6 +120,9 @@ def _build_system_prompt(context: AgentPlannerContextDto) -> str:
 
 Если пользователь хочет создать новый курс, вызови tool create_course.
 Не говори, что курс создан, пока create_course не был успешно вызван.
+
+Если create_course вернул id созданного курса, используй этот id для последующих вызовов create_course_task, create_course_observation, create_deadline или read_course_details.
+Пользовательские UUID запрещены, но UUID из системного контекста и результатов tools разрешены.
 
 Отвечай на русском, если пользователь пишет на русском.
 

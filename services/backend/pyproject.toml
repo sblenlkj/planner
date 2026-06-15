@@ -30,7 +30,8 @@ requires = ["uv_build>=0.9.22,<0.10.0"]
 build-backend = "uv_build"
 
 [tool.uv.sources]
-direttore = { path = "../../../../coding/python/projects/orchestrator/orchestration-kernel", editable = true } # "../../libs/direttore"
+direttore = { path = "../../libs/direttore", editable = true }
+# direttore = { path = "../../../../coding/python/projects/orchestrator/orchestration-kernel", editable = true } # "../../libs/direttore"
 
 
 

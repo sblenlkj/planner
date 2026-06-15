@@ -6,8 +6,6 @@ from uuid import UUID
 from langchain_core.tools import StructuredTool
 from pydantic import BaseModel, Field
 
-from agent.application.dto.agent_context import AgentPlannerContextDto
-from agent.application.dto.course import CourseDto
 from agent.application.ports.analytics_context import AnalyticsContextPort
 from agent.application.ports.course_context import CourseContextPort
 from agent.application.ports.schedule_context import ScheduleContextPort
@@ -23,10 +21,10 @@ class CreateCourseArgs(BaseModel):
 
 
 class CreateCourseTaskArgs(BaseModel):
-    course_ref: str = Field(
+    course_id: str = Field(
         description=(
-            "Название или id курса из текущего системного контекста. "
-            "Не используй id, который написал пользователь руками."
+            "UUID курса. Используй только UUID из системного контекста или из результата create_course. "
+            "Не используй UUID, написанный пользователем."
         )
     )
     title: str = Field(description="Название задачи курса.")
@@ -44,7 +42,7 @@ class CreateReminderArgs(BaseModel):
     remind_at: str = Field(
         description=(
             "Дата и время напоминания в ISO формате. "
-            "Если пользователь указал относительное время, преобразуй его относительно текущей даты из контекста."
+            "Если пользователь указал относительное время, преобразуй его относительно текущей даты из системного контекста."
         )
     )
     title: str = Field(description="Короткий заголовок напоминания.")
@@ -58,7 +56,7 @@ class CreateDeadlineArgs(BaseModel):
     due_at: str = Field(
         description=(
             "Дата и время дедлайна в ISO формате. "
-            "Если пользователь указал относительное время, преобразуй его относительно текущей даты из контекста."
+            "Если пользователь указал относительное время, преобразуй его относительно текущей даты из системного контекста."
         )
     )
     title: str = Field(description="Короткий заголовок дедлайна.")
@@ -66,9 +64,12 @@ class CreateDeadlineArgs(BaseModel):
         default=None,
         description="Дополнительное описание дедлайна.",
     )
-    course_ref: str | None = Field(
+    course_id: str | None = Field(
         default=None,
-        description="Название или id курса из текущего контекста, если дедлайн связан с курсом.",
+        description=(
+            "UUID курса, если дедлайн связан с курсом. "
+            "Используй только UUID из системного контекста или результата tool call."
+        ),
     )
 
 
@@ -99,23 +100,34 @@ class CreateDateObservationArgs(BaseModel):
 
 
 class CreateCourseObservationArgs(BaseModel):
-    course_ref: str = Field(
-        description="Название или id курса из текущего системного контекста."
+    course_id: str = Field(
+        description=(
+            "UUID курса. Используй только UUID из системного контекста или из результата create_course."
+        )
     )
     title: str = Field(description="Короткий заголовок наблюдения по курсу.")
     description: str = Field(description="Содержательное наблюдение по курсу.")
 
 
 class ReadCourseDetailsArgs(BaseModel):
-    course_ref: str = Field(
-        description="Название или id курса из текущего системного контекста."
+    course_id: str = Field(
+        description=(
+            "UUID курса. Используй только UUID из системного контекста или из результата create_course."
+        )
+    )
+    with_observations: bool = Field(
+        default=True,
+        description="Нужно ли читать наблюдения курса.",
+    )
+    with_tasks: bool = Field(
+        default=True,
+        description="Нужно ли читать задачи курса.",
     )
 
 
 def build_planner_tools(
     *,
     execution_context: AgentExecutionContext,
-    planner_context: AgentPlannerContextDto,
     course_context: CourseContextPort,
     schedule_context: ScheduleContextPort,
     analytics_context: AnalyticsContextPort,
@@ -138,15 +150,15 @@ def build_planner_tools(
         )
 
     async def create_course_task(
-        course_ref: str,
+        course_id: str,
         title: str,
         description: str | None = None,
         priority: int = 2,
     ) -> str:
-        course = _resolve_course(planner_context, course_ref)
+        parsed_course_id = _parse_uuid(course_id, field_name="course_id")
 
         task = await course_context.create_course_task(
-            course.id,
+            parsed_course_id,
             title=title,
             description=description,
             priority=priority,
@@ -187,20 +199,20 @@ def build_planner_tools(
         due_at: str,
         title: str,
         description: str | None = None,
-        course_ref: str | None = None,
+        course_id: str | None = None,
     ) -> str:
         deadline_datetime = _parse_datetime(due_at)
 
-        course_id: UUID | None = None
-        if course_ref:
-            course_id = _resolve_course(planner_context, course_ref).id
+        parsed_course_id: UUID | None = None
+        if course_id:
+            parsed_course_id = _parse_uuid(course_id, field_name="course_id")
 
         deadline = await schedule_context.create_deadline(
             execution_context.business_user_id,
             due_at=deadline_datetime,
             title=title,
             description=description,
-            course_id=course_id,
+            course_id=parsed_course_id,
             course_task_id=None,
         )
 
@@ -252,14 +264,14 @@ def build_planner_tools(
         )
 
     async def create_course_observation(
-        course_ref: str,
+        course_id: str,
         title: str,
         description: str,
     ) -> str:
-        course = _resolve_course(planner_context, course_ref)
+        parsed_course_id = _parse_uuid(course_id, field_name="course_id")
 
         observation = await course_context.create_course_observation(
-            course.id,
+            parsed_course_id,
             title=title,
             description=description,
         )
@@ -272,13 +284,17 @@ def build_planner_tools(
             f"description: {observation.description}"
         )
 
-    async def read_course_details(course_ref: str) -> str:
-        course = _resolve_course(planner_context, course_ref)
+    async def read_course_details(
+        course_id: str,
+        with_observations: bool = True,
+        with_tasks: bool = True,
+    ) -> str:
+        parsed_course_id = _parse_uuid(course_id, field_name="course_id")
 
         detailed_course = await course_context.get_course(
-            course.id,
-            with_tasks=True,
-            with_observations=True,
+            parsed_course_id,
+            with_tasks=with_tasks,
+            with_observations=with_observations,
         )
 
         return _format_course_details(detailed_course)
@@ -299,7 +315,7 @@ def build_planner_tools(
             name="create_course_task",
             description=(
                 "Создает задачу внутри существующего курса. "
-                "Курс выбирай только из текущего системного контекста."
+                "course_id должен быть UUID из системного контекста или из результата create_course."
             ),
             args_schema=CreateCourseTaskArgs,
         ),
@@ -360,43 +376,11 @@ def build_planner_tools(
     ]
 
 
-def _resolve_course(
-    planner_context: AgentPlannerContextDto,
-    course_ref: str,
-) -> CourseDto:
-    normalized_ref = course_ref.strip().lower()
-
-    for course in planner_context.courses:
-        if str(course.id) == course_ref.strip():
-            return course
-
-    exact_title_matches = [
-        course
-        for course in planner_context.courses
-        if course.title.strip().lower() == normalized_ref
-    ]
-    if len(exact_title_matches) == 1:
-        return exact_title_matches[0]
-
-    partial_title_matches = [
-        course
-        for course in planner_context.courses
-        if normalized_ref in course.title.strip().lower()
-        or course.title.strip().lower() in normalized_ref
-    ]
-    if len(partial_title_matches) == 1:
-        return partial_title_matches[0]
-
-    available_courses = "\n".join(
-        f"- id={course.id}; title={course.title}"
-        for course in planner_context.courses
-    ) or "- курсов в текущем контексте нет"
-
-    raise ValueError(
-        "Не удалось однозначно выбрать курс из текущего контекста.\n"
-        f"Переданный course_ref: {course_ref}\n"
-        f"Доступные курсы:\n{available_courses}"
-    )
+def _parse_uuid(value: str, *, field_name: str) -> UUID:
+    try:
+        return UUID(value.strip())
+    except ValueError as exc:
+        raise ValueError(f"{field_name} должен быть UUID. Получено: {value!r}") from exc
 
 
 def _parse_date(value: str) -> date:
@@ -409,12 +393,10 @@ def _parse_datetime(value: str) -> datetime:
     if normalized.endswith("Z"):
         normalized = normalized[:-1] + "+00:00"
 
-    parsed = datetime.fromisoformat(normalized)
-
-    return parsed
+    return datetime.fromisoformat(normalized)
 
 
-def _format_course_details(course: CourseDto) -> str:
+def _format_course_details(course) -> str:
     tasks = "\n".join(
         (
             f"- id={task.id}; title={task.title}; "
