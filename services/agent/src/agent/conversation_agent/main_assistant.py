@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 from uuid import UUID
+from langchain_gigachat import GigaChat
 
 from langchain.agents import create_agent
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
@@ -11,6 +12,8 @@ from langchain_core.runnables import RunnableConfig
 from agent.api.schemas import ConversationMessage
 from agent.application.dto.agent_context import AgentPlannerContextDto
 from agent.application.ports.course_context import CourseContextPort
+from agent.application.ports.analytics_context import AnalyticsContextPort
+from agent.application.ports.schedule_context import ScheduleContextPort
 from agent.conversation_agent.runtime_context import AgentExecutionContext
 from agent.conversation_agent.tools.planner_tools import build_planner_tools
 
@@ -22,11 +25,13 @@ class MainAssistantAgentResult:
 
 async def run_main_assistant_agent(
     *,
-    llm: Any,
+    llm: GigaChat,
     business_user_id: UUID,
     messages: list[ConversationMessage],
     planner_context: AgentPlannerContextDto,
     course_context: CourseContextPort,
+    schedule_context: ScheduleContextPort,
+    analytics_context: AnalyticsContextPort,
     callbacks: list[Any] | None = None,
 ) -> MainAssistantAgentResult:
     execution_context = AgentExecutionContext(
@@ -35,7 +40,10 @@ async def run_main_assistant_agent(
 
     tools = build_planner_tools(
         execution_context=execution_context,
+        planner_context=planner_context,
         course_context=course_context,
+        schedule_context=schedule_context,
+        analytics_context=analytics_context,
     )
 
     agent = create_agent(

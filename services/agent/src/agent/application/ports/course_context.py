@@ -15,7 +15,14 @@ class CourseContextPort(Protocol):
     # Read side
     async def list_courses(self, user_id: UUID) -> list[CourseDto]: ...
 
-    async def get_course(self, course_id: UUID) -> CourseDto: ...
+    async def get_course(
+        self,
+        course_id: UUID,
+        *,
+        with_observations: bool = False,
+        with_tasks: bool = True,
+        task_status: str | None = None,
+    ) -> CourseDto: ...
 
     async def list_course_tasks(self, course_id: UUID) -> list[CourseTaskDto]: ...
 

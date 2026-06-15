@@ -54,12 +54,17 @@ async def respond_to_conversation(
     callbacks: list[Any] | None = [langfuse_callback] if langfuse_callback else None
 
     async with llm_slot_pool.acquire(model_kind=LlmModelKind.STRONG) as llm_slot:
+        if llm_slot.llm is None:
+            raise ValueError("Failed to acquire LLM slot.")
+
         result = await run_main_assistant_agent(
             llm=llm_slot.llm,
             business_user_id=context.business_user_id,
             messages=request.messages,
             planner_context=planner_context,
             course_context=backend_contexts.course,
+            schedule_context=backend_contexts.schedule,
+            analytics_context=backend_contexts.analytics,
             callbacks=callbacks,
         )
 

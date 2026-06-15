@@ -3,12 +3,24 @@ from __future__ import annotations
 from typing import Any
 from uuid import UUID
 
-from agent.application.dto import CourseDto, CourseObservationDto, CourseTaskDto, CourseTaskObservationDto
+from agent.application.dto import (
+    CourseDto,
+    CourseObservationDto,
+    CourseTaskDto,
+    CourseTaskObservationDto,
+)
 from agent.application.ports import CourseContextPort
 from agent.core.backend_settings import BackendApiSettings
 
 from .http_client import BackendHttpClient
-from .parsing import as_int_or_none, as_optional_uuid, as_uuid, require_mapping, unwrap_items, extract_created_id
+from .parsing import (
+    as_int_or_none,
+    as_optional_uuid,
+    as_uuid,
+    extract_created_id,
+    require_mapping,
+    unwrap_items,
+)
 
 
 class HttpCourseContextAdapter(CourseContextPort):
@@ -17,31 +29,81 @@ class HttpCourseContextAdapter(CourseContextPort):
         self._settings = settings
 
     async def list_courses(self, user_id: UUID) -> list[CourseDto]:
-        payload = await self._client.get_json(self._settings.list_courses_path, params={"user_id": str(user_id)})
-        return [_parse_course(require_mapping(item), fallback_user_id=user_id) for item in unwrap_items(payload, "courses")]
+        payload = await self._client.get_json(
+            self._settings.list_courses_path,
+            params={"user_id": str(user_id)},
+        )
 
-    async def get_course(self, course_id: UUID) -> CourseDto:
+        return [
+            CourseDto.from_api(require_mapping(item))
+            for item in unwrap_items(payload, "courses")
+        ]
+
+    async def get_course(
+        self,
+        course_id: UUID,
+        *,
+        with_observations: bool = False,
+        with_tasks: bool = True,
+        task_status: str | None = None,
+    ) -> CourseDto:
         path = self._settings.get_course_path.format(course_id=course_id)
-        return _parse_course(require_mapping(await self._client.get_json(path)))
+
+        params: dict[str, Any] = {
+            "with_observations": with_observations,
+            "with_tasks": with_tasks,
+        }
+
+        if task_status is not None:
+            params["task_status"] = task_status
+
+        payload = await self._client.get_json(path, params=params)
+
+        return CourseDto.from_api(require_mapping(payload))
 
     async def list_course_tasks(self, course_id: UUID) -> list[CourseTaskDto]:
         path = self._settings.list_course_tasks_path.format(course_id=course_id)
         payload = await self._client.get_json(path)
-        return [_parse_course_task(require_mapping(item), fallback_course_id=course_id) for item in unwrap_items(payload, "tasks", "course_tasks")]
+
+        return [
+            _parse_course_task(require_mapping(item), fallback_course_id=course_id)
+            for item in unwrap_items(payload, "tasks", "course_tasks")
+        ]
 
     async def get_course_task(self, task_id: UUID) -> CourseTaskDto:
         path = self._settings.get_course_task_path.format(task_id=task_id)
-        return _parse_course_task(require_mapping(await self._client.get_json(path)))
+        payload = await self._client.get_json(path)
 
-    async def list_course_observations(self, course_id: UUID) -> list[CourseObservationDto]:
+        return _parse_course_task(require_mapping(payload))
+
+    async def list_course_observations(
+        self,
+        course_id: UUID,
+    ) -> list[CourseObservationDto]:
         path = self._settings.list_course_observations_path.format(course_id=course_id)
         payload = await self._client.get_json(path)
-        return [_parse_course_observation(require_mapping(item), fallback_course_id=course_id) for item in unwrap_items(payload, "observations", "course_observations")]
 
-    async def list_course_task_observations(self, task_id: UUID) -> list[CourseTaskObservationDto]:
+        return [
+            _parse_course_observation(require_mapping(item), fallback_course_id=course_id)
+            for item in unwrap_items(payload, "observations", "course_observations")
+        ]
+
+    async def list_course_task_observations(
+        self,
+        task_id: UUID,
+    ) -> list[CourseTaskObservationDto]:
         path = self._settings.list_course_task_observations_path.format(task_id=task_id)
         payload = await self._client.get_json(path)
-        return [_parse_course_task_observation(require_mapping(item), fallback_task_id=task_id) for item in unwrap_items(payload, "observations", "task_observations", "course_task_observations")]
+
+        return [
+            _parse_course_task_observation(require_mapping(item), fallback_task_id=task_id)
+            for item in unwrap_items(
+                payload,
+                "observations",
+                "task_observations",
+                "course_task_observations",
+            )
+        ]
 
     async def create_course(
         self,
@@ -99,12 +161,19 @@ class HttpCourseContextAdapter(CourseContextPort):
             status="pending",
             progress=0,
             next_task_id=None,
+            observations=(),
         )
 
-    async def update_course_task_progress(self, task_id: UUID, *, progress: int) -> CourseTaskDto:
+    async def update_course_task_progress(
+        self,
+        task_id: UUID,
+        *,
+        progress: int,
+    ) -> CourseTaskDto:
         path = self._settings.update_course_task_progress_path.format(task_id=task_id)
-        payload = require_mapping(await self._client.patch_json(path, json={"progress": progress}))
-        return _parse_course_task(payload)
+        payload = await self._client.patch_json(path, json={"progress": progress})
+
+        return _parse_course_task(require_mapping(payload))
 
     async def create_course_observation(
         self,
@@ -158,42 +227,73 @@ class HttpCourseContextAdapter(CourseContextPort):
         )
 
 
-def _parse_course(payload: dict[str, Any], *, fallback_user_id: UUID | None = None) -> CourseDto:
-    return CourseDto(
-        id=as_uuid(payload.get("id") or payload.get("course_id"), field="course_id"),
-        user_id=as_uuid(payload.get("user_id") or fallback_user_id, field="user_id"),
-        title=str(payload.get("title") or payload.get("name") or ""),
-        description=payload.get("description"),
-        status=payload.get("status"),
-    )
-
-
-def _parse_course_task(payload: dict[str, Any], *, fallback_course_id: UUID | None = None) -> CourseTaskDto:
+def _parse_course_task(
+    payload: dict[str, Any],
+    *,
+    fallback_course_id: UUID | None = None,
+) -> CourseTaskDto:
     return CourseTaskDto(
-        id=as_uuid(payload.get("id") or payload.get("task_id") or payload.get("course_task_id"), field="task_id"),
-        course_id=as_uuid(payload.get("course_id") or fallback_course_id, field="course_id"),
+        id=as_uuid(
+            payload.get("id")
+            or payload.get("task_id")
+            or payload.get("course_task_id"),
+            field="task_id",
+        ),
+        course_id=as_uuid(
+            payload.get("course_id") or fallback_course_id,
+            field="course_id",
+        ),
         title=str(payload.get("title") or payload.get("name") or ""),
         description=payload.get("description"),
         priority=as_int_or_none(payload.get("priority")),
         status=payload.get("status"),
         progress=as_int_or_none(payload.get("progress")),
-        next_task_id=as_optional_uuid(payload.get("next_task_id"), field="next_task_id"),
+        next_task_id=as_optional_uuid(
+            payload.get("next_task_id"),
+            field="next_task_id",
+        ),
+        observations=tuple(
+            _parse_course_task_observation(require_mapping(item))
+            for item in (payload.get("observations") or ())
+        ),
     )
 
 
-def _parse_course_observation(payload: dict[str, Any], *, fallback_course_id: UUID | None = None) -> CourseObservationDto:
+def _parse_course_observation(
+    payload: dict[str, Any],
+    *,
+    fallback_course_id: UUID | None = None,
+) -> CourseObservationDto:
     return CourseObservationDto(
-        id=as_uuid(payload.get("id") or payload.get("observation_id"), field="observation_id"),
-        course_id=as_uuid(payload.get("course_id") or fallback_course_id, field="course_id"),
+        id=as_uuid(
+            payload.get("id") or payload.get("observation_id"),
+            field="observation_id",
+        ),
+        course_id=as_uuid(
+            payload.get("course_id") or fallback_course_id,
+            field="course_id",
+        ),
         title=str(payload.get("title") or ""),
         description=str(payload.get("description") or ""),
     )
 
 
-def _parse_course_task_observation(payload: dict[str, Any], *, fallback_task_id: UUID | None = None) -> CourseTaskObservationDto:
+def _parse_course_task_observation(
+    payload: dict[str, Any],
+    *,
+    fallback_task_id: UUID | None = None,
+) -> CourseTaskObservationDto:
     return CourseTaskObservationDto(
-        id=as_uuid(payload.get("id") or payload.get("observation_id"), field="observation_id"),
-        task_id=as_uuid(payload.get("task_id") or payload.get("course_task_id") or fallback_task_id, field="task_id"),
+        id=as_uuid(
+            payload.get("id") or payload.get("observation_id"),
+            field="observation_id",
+        ),
+        task_id=as_uuid(
+            payload.get("task_id")
+            or payload.get("course_task_id")
+            or fallback_task_id,
+            field="task_id",
+        ),
         title=str(payload.get("title") or ""),
         description=str(payload.get("description") or ""),
         progress=as_int_or_none(payload.get("progress")),
