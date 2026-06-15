@@ -1,0 +1,12 @@
+curl -X POST "http://127.0.0.1:8002/internal/conversations/onboarding/respond" \
+  -H "Authorization: Bearer dima_internal" \
+  -H "X-Business-User-Id: 11111111-1111-1111-1111-111111111111" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "messages": [
+      {
+        "role": "user",
+        "content": "Привет, я хочу настроить planner"
+      }
+    ]
+  }'

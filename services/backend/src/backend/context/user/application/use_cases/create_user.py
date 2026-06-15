@@ -11,7 +11,7 @@ from backend.context.user.application.orchestration import (
 )
 from backend.context.user.domain.user import User
 from backend.shared.security.password_hashing import PasswordHasher
-
+from backend.context.user.application.errors import UserLoginAlreadyTakenError
 
 @dataclass(frozen=True, kw_only=True)
 class CreateUserCommand(Command):
@@ -33,6 +33,15 @@ class CreateUserCommandHandler(AbstractCommandHandler):
         context: UserCommandHandlerContext,
     ) -> CreateUserCommandResult:
         user_id = command.id or uuid4()
+
+        if command.login is not None:
+            existing_user = await context.uow.users.get_user_by_login(
+                login=command.login,
+            )
+
+            if existing_user is not None:
+                raise UserLoginAlreadyTakenError(login=command.login)
+
         password_hash = PasswordHasher().hash_password(command.password)
 
         user = User.create_user(

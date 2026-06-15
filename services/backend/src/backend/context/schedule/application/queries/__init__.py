@@ -52,6 +52,12 @@ from backend.context.schedule.application.queries.schedule_day_exists import (
     ScheduleDayExistsQueryHandler,
     ScheduleDayExistsQueryResult,
 )
+from backend.context.schedule.application.queries.list_schedule_date_observations import (
+    ListScheduleDateObservationsQuery,
+    ListScheduleDateObservationsQueryHandler,
+    ListScheduleDateObservationsQueryResult,
+    ScheduleDateObservationReadModel,
+)
 
 
 __all__ = [
@@ -95,4 +101,8 @@ __all__ = [
     "TemplateDayReadModel",
     "TemplateTimeBlockReadModel",
     "WeeklyScheduleObservationReadModel",
+    "ListScheduleDateObservationsQuery",
+    "ListScheduleDateObservationsQueryHandler",
+    "ListScheduleDateObservationsQueryResult",
+    "ScheduleDateObservationReadModel",
 ]

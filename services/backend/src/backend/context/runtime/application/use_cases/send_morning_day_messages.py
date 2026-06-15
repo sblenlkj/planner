@@ -10,9 +10,9 @@ from backend.context.runtime.application.orchestration import (
     RuntimeCommandHandlerContext,
     command_handler_registry,
 )
-from backend.context.runtime.application.ports.schedule_runtime_port import (
-    MorningDayMessageStatus,
-    ScheduleRuntimePort,
+from backend.context.runtime.application.ports.agent_server_port import (
+    AgentServerPort,
+    MorningBriefingStatus,
 )
 from backend.context.runtime.application.ports.telegram_gateway_port import (
     TelegramGatewayPort,
@@ -60,11 +60,11 @@ class SendMorningDayMessagesCommandHandler(AbstractCommandHandler):
         self,
         *,
         user_runtime_port: UserRuntimePort,
-        schedule_runtime_port: ScheduleRuntimePort,
+        agent_server_port: AgentServerPort,
         telegram_gateway_port: TelegramGatewayPort,
     ) -> None:
         self._user_runtime_port = user_runtime_port
-        self._schedule_runtime_port = schedule_runtime_port
+        self._agent_server_port = agent_server_port
         self._telegram_gateway_port = telegram_gateway_port
 
     async def __call__(
@@ -164,7 +164,7 @@ class SendMorningDayMessagesCommandHandler(AbstractCommandHandler):
 
         for user_id in user_ids:
             try:
-                message_result = await self._schedule_runtime_port.build_morning_day_message(
+                briefing = await self._agent_server_port.run_morning_briefing(
                     user_id=user_id,
                     day=target_day,
                 )
@@ -172,36 +172,36 @@ class SendMorningDayMessagesCommandHandler(AbstractCommandHandler):
                 failed_users.append(
                     {
                         "user_id": str(user_id),
-                        "stage": "build_morning_day_message",
+                        "stage": "run_morning_briefing",
                         "error": str(exc),
                     }
                 )
                 continue
 
-            if message_result.status == MorningDayMessageStatus.NOT_READY:
+            if briefing.status == MorningBriefingStatus.NOT_READY:
                 skipped_users.append(
                     {
                         "user_id": str(user_id),
-                        "reason": message_result.reason or "day_not_ready",
+                        "reason": briefing.reason or "morning_briefing_not_ready",
                     }
                 )
                 continue
 
-            if message_result.status == MorningDayMessageStatus.ERROR:
+            if briefing.status == MorningBriefingStatus.ERROR:
                 failed_users.append(
                     {
                         "user_id": str(user_id),
-                        "stage": "build_morning_day_message",
-                        "error": message_result.reason or "unknown_schedule_error",
+                        "stage": "run_morning_briefing",
+                        "error": briefing.reason or "unknown_agent_server_error",
                     }
                 )
                 continue
 
-            if not message_result.text or not message_result.text.strip():
+            if not briefing.text or not briefing.text.strip():
                 skipped_users.append(
                     {
                         "user_id": str(user_id),
-                        "reason": "empty_morning_message",
+                        "reason": "empty_morning_briefing",
                     }
                 )
                 continue
@@ -209,7 +209,7 @@ class SendMorningDayMessagesCommandHandler(AbstractCommandHandler):
             try:
                 await self._telegram_gateway_port.send_message(
                     user_id=user_id,
-                    text=message_result.text,
+                    text=briefing.text,
                 )
             except Exception as exc:
                 failed_users.append(

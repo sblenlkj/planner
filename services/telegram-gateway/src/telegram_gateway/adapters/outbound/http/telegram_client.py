@@ -1,44 +1,50 @@
+import asyncio
+
 import httpx
 
 from telegram_gateway.application.ports.telegram_message_sender import (
     TelegramMessageSender,
 )
-
+from telegram_gateway.application.errors import TelegramMessageDeliveryError
 
 class TelegramBotClient(TelegramMessageSender):
     def __init__(
         self,
         *,
         bot_token: str,
-        timeout_seconds: float = 10.0,
+        timeout_seconds: float = 30.0,
     ) -> None:
         self._base_url = f"https://api.telegram.org/bot{bot_token}"
         self._timeout_seconds = timeout_seconds
 
-    async def send_text(self, telegram_chat_id: int, text: str) -> None:
-        async with httpx.AsyncClient(timeout=self._timeout_seconds) as client:
-            response = await client.post(
-                f"{self._base_url}/sendMessage",
-                json={"chat_id": telegram_chat_id, "text": text},
-            )
-
-        response.raise_for_status()
-        payload = response.json()
-
-        if not payload.get("ok", False):
-            raise RuntimeError(
-                f"Telegram sendMessage failed: {payload.get('description', 'unknown')}"
-            )
-
-    async def send_chat_action(
+    async def send_text(
         self,
         telegram_chat_id: int,
-        action: str = "typing",
+        text: str,
     ) -> None:
-        async with httpx.AsyncClient(timeout=self._timeout_seconds) as client:
-            response = await client.post(
-                f"{self._base_url}/sendChatAction",
-                json={"chat_id": telegram_chat_id, "action": action},
-            )
+        last_error: Exception | None = None
 
-        response.raise_for_status()
+        for attempt in range(3):
+            try:
+                async with httpx.AsyncClient(timeout=self._timeout_seconds) as client:
+                    response = await client.post(
+                        f"{self._base_url}/sendMessage",
+                        json={
+                            "chat_id": telegram_chat_id,
+                            "text": text,
+                        },
+                    )
+
+                if response.is_error:
+                    raise TelegramMessageDeliveryError(
+                        "Telegram sendMessage failed: "
+                        f"status={response.status_code}, body={response.text}"
+                    )
+
+                return
+
+            except (httpx.TimeoutException, httpx.NetworkError) as exc:
+                last_error = exc
+                await asyncio.sleep(0.5 * (attempt + 1))
+
+        raise RuntimeError(f"Telegram sendMessage failed after retries: {last_error}")

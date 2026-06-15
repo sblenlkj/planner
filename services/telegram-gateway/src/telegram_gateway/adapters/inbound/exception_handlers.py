@@ -9,7 +9,6 @@ def register_exception_handlers(app: FastAPI) -> None:
         TelegramGatewayApplicationError,
         application_error_handler,
     )
-
     app.add_exception_handler(
         Exception,
         unexpected_error_handler,

@@ -56,3 +56,12 @@ class UpdateUserLastSessionAtRequest(BaseModel):
 class UpdateUserLastSessionAtResponse(BaseModel):
     user_id: UUID
     last_session_at: datetime
+
+class GetUserResponse(BaseModel):
+    user_id: UUID
+    login: str | None
+    name: str | None
+    language: str | None
+    utc_offset_minutes: int | None
+    region: str | None
+    runtime_status: UserRuntimeStatus | None

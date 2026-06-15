@@ -37,27 +37,27 @@ class RuntimeJobDefinition:
 
 
 RUNTIME_JOB_DEFINITIONS: tuple[RuntimeJobDefinition, ...] = (
-    RuntimeJobDefinition(
-        job_type=RuntimeJobType.CLOSE_SESSIONS,
-        job_key=CLOSE_ACTIVE_SESSIONS_JOB_KEY,
-        cron_expression=CLOSE_ACTIVE_SESSIONS_CRON,
-        handler_key=CLOSE_ACTIVE_SESSIONS_HANDLER_KEY,
-        payload={},
-    ),
-    RuntimeJobDefinition(
-        job_type=RuntimeJobType.BATCH_OBSERVATIONS,
-        job_key=BATCH_OBSERVATIONS_JOB_KEY,
-        cron_expression=BATCH_OBSERVATIONS_CRON,
-        handler_key=BATCH_OBSERVATIONS_HANDLER_KEY,
-        payload={},
-    ),
-    RuntimeJobDefinition(
-        job_type=RuntimeJobType.GENERATE_DAY,
-        job_key=GENERATE_DAY_JOB_KEY,
-        cron_expression=GENERATE_DAY_CRON,
-        handler_key=GENERATE_DAY_HANDLER_KEY,
-        payload={},
-    ),
+    # RuntimeJobDefinition(
+    #     job_type=RuntimeJobType.CLOSE_SESSIONS,
+    #     job_key=CLOSE_ACTIVE_SESSIONS_JOB_KEY,
+    #     cron_expression=CLOSE_ACTIVE_SESSIONS_CRON,
+    #     handler_key=CLOSE_ACTIVE_SESSIONS_HANDLER_KEY,
+    #     payload={},
+    # ),
+    # RuntimeJobDefinition(
+    #     job_type=RuntimeJobType.BATCH_OBSERVATIONS,
+    #     job_key=BATCH_OBSERVATIONS_JOB_KEY,
+    #     cron_expression=BATCH_OBSERVATIONS_CRON,
+    #     handler_key=BATCH_OBSERVATIONS_HANDLER_KEY,
+    #     payload={},
+    # ),
+    # RuntimeJobDefinition(
+    #     job_type=RuntimeJobType.GENERATE_DAY,
+    #     job_key=GENERATE_DAY_JOB_KEY,
+    #     cron_expression=GENERATE_DAY_CRON,
+    #     handler_key=GENERATE_DAY_HANDLER_KEY,
+    #     payload={},
+    # ),
     RuntimeJobDefinition(
         job_type=RuntimeJobType.MORNING_DELIVERY,
         job_key=MORNING_DELIVERY_JOB_KEY,

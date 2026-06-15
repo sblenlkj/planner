@@ -1,22 +1,18 @@
 class TelegramGatewayApplicationError(Exception):
-    """Base application error."""
+    """Base Telegram Gateway application error."""
 
 
 class TelegramBindingNotFoundError(TelegramGatewayApplicationError):
-    """Telegram binding was not found."""
+    pass
 
 
-class EmptyTelegramMessageError(TelegramGatewayApplicationError):
-    """Incoming Telegram message has no usable text."""
+class BusinessUserNotFoundError(TelegramGatewayApplicationError):
+    pass
 
 
-class UnsupportedTelegramUpdateError(TelegramGatewayApplicationError):
-    """Telegram update cannot be processed by current gateway."""
+class AgentResponseError(TelegramGatewayApplicationError):
+    pass
 
 
-class InvalidAgentResponseError(TelegramGatewayApplicationError):
-    """Agent returned invalid response contract."""
-
-
-class NoActiveTelegramSessionError(TelegramGatewayApplicationError):
-    """There is no active Telegram session to close."""
+class TelegramMessageDeliveryError(TelegramGatewayApplicationError):
+    pass

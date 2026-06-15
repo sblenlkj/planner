@@ -70,6 +70,31 @@ class Settings(BaseSettings):
         alias="TELEGRAM_GATEWAY_PORT",
     )
 
+    agent_server_scheme: str = Field(
+        default="http",
+        alias="AGENT_SERVER_SCHEME",
+    )
+    agent_server_host: str = Field(
+        default="127.0.0.1",
+        alias="AGENT_SERVER_HOST",
+    )
+    agent_server_port: int = Field(
+        default=8002,
+        alias="AGENT_SERVER_PORT",
+    )
+
+    @property
+    def agent_server_base_url(self) -> str:
+        return (
+            f"{self.agent_server_scheme}://"
+            f"{self.agent_server_host}:"
+            f"{self.agent_server_port}"
+        )
+
+    @property
+    def agent_server_morning_briefing_url(self) -> str:
+        return f"{self.agent_server_base_url}/internal/workflows/morning-briefing/run"
+
     @property
     def telegram_gateway_base_url(self) -> str:
         return (

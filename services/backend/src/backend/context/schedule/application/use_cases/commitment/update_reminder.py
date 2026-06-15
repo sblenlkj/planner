@@ -138,9 +138,14 @@ class UpdateReminderCommandHandler(AbstractCommandHandler):
         local_datetime: datetime,
         utc_offset_minutes: int,
     ) -> datetime:
+        # MVP rule:
+        # API may receive timezone-aware UTC datetime from Agent Server.
+        # Database stores UTC as TIMESTAMP WITHOUT TIME ZONE.
+        #
+        # Therefore we normalize to UTC and strip tzinfo before persistence.
+
         if local_datetime.tzinfo is not None:
-            raise ValueError("remind_at must be naive user-local datetime")
+            return local_datetime.astimezone(UTC).replace(tzinfo=None)
 
-        utc_datetime = local_datetime - timedelta(minutes=utc_offset_minutes)
-
-        return utc_datetime.replace(tzinfo=UTC)
+        # Naive datetime is treated as already UTC.
+        return local_datetime

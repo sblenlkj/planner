@@ -48,6 +48,11 @@ from .update_user_last_session_at import (
     UpdateUserLastSessionAtCommandHandler,
     UpdateUserLastSessionAtCommandResult,
 )
+from .get_user import (
+    GetUserCommand,
+    GetUserCommandHandler,
+    GetUserCommandResult,
+)
 
 __all__ = [
     "AuthenticateUserCommand",
@@ -80,4 +85,7 @@ __all__ = [
     "UpdateUserLastSessionAtCommand",
     "UpdateUserLastSessionAtCommandHandler",
     "UpdateUserLastSessionAtCommandResult",
+    "GetUserCommand",
+    "GetUserCommandHandler",
+    "GetUserCommandResult",
 ]

@@ -3,9 +3,13 @@ from __future__ import annotations
 from typing import Annotated
 
 from direttore import ModularDirettoreWithSimpleSession
-from fastapi import APIRouter, Depends
 from uuid import UUID
+from fastapi import APIRouter, Depends, HTTPException, status
 
+from backend.context.user.application.errors import (
+    UserLoginAlreadyTakenError,
+    UserNotFoundError,
+)
 from backend.context.user.adapters.inbound.schemas import (
     AuthenticateUserRequest,
     AuthenticateUserResponse,
@@ -18,6 +22,7 @@ from backend.context.user.adapters.inbound.schemas import (
     UpdateUserRuntimeStatusResponse,
     UpdateUserLastSessionAtRequest,
     UpdateUserLastSessionAtResponse,
+    GetUserResponse,
 )
 from backend.context.user.application.use_cases import (
     AuthenticateUserCommand,
@@ -32,9 +37,33 @@ from backend.context.user.application.use_cases import (
     UpdateUserRuntimeStatusCommandResult,
     UpdateUserLastSessionAtCommand,
     UpdateUserLastSessionAtCommandResult,
+    GetUserCommand,
+    GetUserCommandResult,
 )
 from backend.bootstrap.direttore import get_direttore
 
+def _raise_http_error(error: Exception) -> None:
+    if isinstance(error, UserNotFoundError):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "code": "user_not_found",
+                "message": str(error),
+                "user_id": str(error.user_id),
+            },
+        ) from error
+
+    if isinstance(error, UserLoginAlreadyTakenError):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail={
+                "code": "user_login_already_taken",
+                "message": str(error),
+                "login": error.login,
+            },
+        ) from error
+
+    raise error
 
 router = APIRouter(
     prefix="/users",
@@ -55,12 +84,15 @@ async def create_user(
     request: CreateUserRequest,
     direttore: DirettoreDep,
 ) -> CreateUserResponse:
-    result = await direttore.handle(
-        CreateUserCommand(
-            password=request.password,
-            login=request.login,
+    try:
+        result = await direttore.handle(
+            CreateUserCommand(
+                password=request.password,
+                login=request.login,
+            )
         )
-    )
+    except Exception as error:
+        _raise_http_error(error)
 
     if not isinstance(result, CreateUserCommandResult):
         raise TypeError(
@@ -71,29 +103,29 @@ async def create_user(
     return CreateUserResponse(user_id=result.user_id)
 
 
-@router.post(
-    "/admin",
-    response_model=CreateAdminResponse,
-)
-async def create_admin(
-    request: CreateAdminRequest,
-    direttore: DirettoreDep,
-) -> CreateAdminResponse:
-    result = await direttore.handle(
-        CreateAdminCommand(
-            login=request.login,
-            name=request.name,
-            password=request.password,
-        )
-    )
+# @router.post(
+#     "/admin",
+#     response_model=CreateAdminResponse,
+# )
+# async def create_admin(
+#     request: CreateAdminRequest,
+#     direttore: DirettoreDep,
+# ) -> CreateAdminResponse:
+#     result = await direttore.handle(
+#         CreateAdminCommand(
+#             login=request.login,
+#             name=request.name,
+#             password=request.password,
+#         )
+#     )
 
-    if not isinstance(result, CreateAdminCommandResult):
-        raise TypeError(
-            "CreateAdminCommand returned unexpected result type. "
-            f"Got {type(result).__module__}.{type(result).__qualname__}."
-        )
+#     if not isinstance(result, CreateAdminCommandResult):
+#         raise TypeError(
+#             "CreateAdminCommand returned unexpected result type. "
+#             f"Got {type(result).__module__}.{type(result).__qualname__}."
+#         )
 
-    return CreateAdminResponse(admin_id=result.admin_id)
+#     return CreateAdminResponse(admin_id=result.admin_id)
 
 
 @router.post(
@@ -203,4 +235,37 @@ async def update_user_last_session_at(
     return UpdateUserLastSessionAtResponse(
         user_id=result.user_id,
         last_session_at=result.last_session_at,
+    )
+
+@router.get(
+    "/{user_id}",
+    response_model=GetUserResponse,
+)
+async def get_user(
+    user_id: UUID,
+    direttore: DirettoreDep,
+) -> GetUserResponse:
+    try:
+        result = await direttore.handle(
+            GetUserCommand(
+                user_id=user_id,
+            )
+        )
+    except Exception as error:
+        _raise_http_error(error)
+
+    if not isinstance(result, GetUserCommandResult):
+        raise TypeError(
+            "GetUserCommand returned unexpected result type. "
+            f"Got {type(result).__module__}.{type(result).__qualname__}."
+        )
+
+    return GetUserResponse(
+        user_id=result.user_id,
+        login=result.login,
+        name=result.name,
+        language=result.language,
+        utc_offset_minutes=result.utc_offset_minutes,
+        region=result.region,
+        runtime_status=result.runtime_status,
     )

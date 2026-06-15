@@ -1,48 +1,61 @@
-from datetime import date
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
+
+from telegram_gateway.domain.models import ConversationMessageRole
+
+class OkResponse(BaseModel):
+    ok: bool = True
 
 
-class TelegramUserSchema(BaseModel):
-    id: int
-    is_bot: bool | None = None
-    first_name: str | None = None
-    username: str | None = None
-    language_code: str | None = None
+class AuthRequest(BaseModel):
+    business_user_id: UUID
 
 
-class TelegramChatSchema(BaseModel):
-    id: int
-    type: str | None = None
+class AuthResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
 
 
-class TelegramMessageSchema(BaseModel):
-    message_id: int
-    from_: TelegramUserSchema = Field(alias="from")
-    chat: TelegramChatSchema
-    text: str | None = None
+class AttachTelegramRequest(BaseModel):
+    business_user_id: UUID
+    telegram_user_id: int
+    telegram_chat_id: int
 
 
-class TelegramUpdateSchema(BaseModel):
-    update_id: int
-    message: TelegramMessageSchema | None = None
-
-
-class SendTelegramMessageRequest(BaseModel):
+class AgentMessageRequest(BaseModel):
     business_user_id: UUID
     text: str
 
 
-class CloseTelegramConversationRequest(BaseModel):
+class AgentMessageResponse(BaseModel):
+    ok: bool = True
+    assistant_text: str | None = None
+
+
+class SendTelegramNotificationRequest(BaseModel):
+    business_user_id: UUID
+    text: str
+
+
+class CloseAgentSessionRequest(BaseModel):
     business_user_id: UUID
 
 
-class CloseTelegramConversationResponse(BaseModel):
+class CloseAgentSessionResponse(BaseModel):
     ok: bool = True
     closed: bool
     reason: str | None = None
 
+class GetAgentSessionRequest(BaseModel):
+    business_user_id: UUID
 
-class OkResponse(BaseModel):
+
+class ConversationMessageResponse(BaseModel):
+    role: ConversationMessageRole
+    content: str
+
+
+class GetAgentSessionResponse(BaseModel):
     ok: bool = True
+    messages: list[ConversationMessageResponse]

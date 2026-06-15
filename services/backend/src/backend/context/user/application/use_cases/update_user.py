@@ -10,6 +10,7 @@ from backend.context.user.application.orchestration import (
     UserCommandHandlerContext,
     command_handler_registry,
 )
+from backend.context.user.application.errors import UserNotFoundError
 
 @dataclass(frozen=True, kw_only=True)
 class UpdateUserCommand(Command):
@@ -38,7 +39,7 @@ class UpdateUserCommandHandler(AbstractCommandHandler):
         user = await context.uow.users.get_user_by_id(user_id=command.user_id)
 
         if user is None:
-            raise ValueError("User does not exist.")
+            raise UserNotFoundError(user_id=command.user_id)
 
         update = UpdateUserDTO(
             user_id=command.user_id,

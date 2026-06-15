@@ -9,6 +9,7 @@ from backend.context.schedule.application.orchestration import (
     ScheduleCommandHandlerContext,
     command_handler_registry,
 )
+from backend.context.schedule.domain.execution.entities.schedule_day import ScheduleDay
 from backend.context.schedule.domain.execution.entities.schedule_day_observation import (
     ScheduleDayObservation,
 )
@@ -43,7 +44,18 @@ class CreateScheduleDayObservationCommandHandler(AbstractCommandHandler):
         )
 
         if schedule_day is None:
-            raise ValueError("schedule day not found")
+            schedule_day = ScheduleDay(
+                user_id=command.user_id,
+                date=command.date,
+                title="Unplanned day",
+                description="Minimal schedule day created automatically for observations.",
+                blocks=[],
+                activities=[],
+            )
+
+            await context.uow.execution_writer.add_schedule_day(
+                schedule_day=schedule_day,
+            )
 
         observation_id = command.id or uuid4()
 

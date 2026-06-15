@@ -4,10 +4,7 @@ import sys
 import structlog
 
 
-def configure_logging(
-    *,
-    debug: bool,
-) -> None:
+def configure_logging(*, debug: bool) -> None:
     logging.basicConfig(
         format="%(message)s",
         stream=sys.stdout,
@@ -32,5 +29,5 @@ def configure_logging(
     )
 
 
-def get_logger(name: str) -> structlog.stdlib.BoundLogger:
+def get_logger(name: str):
     return structlog.get_logger(name)

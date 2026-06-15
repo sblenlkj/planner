@@ -10,19 +10,10 @@ class TelegramBinding:
     telegram_chat_id: int
 
 
-@dataclass(slots=True)
-class TelegramIncomingMessage:
-    update_id: int
-    telegram_user_id: int
-    telegram_chat_id: int
-    telegram_message_id: int
-    text: str
-
-
 class ConversationMessageRole(StrEnum):
-    SYSTEM = "system"
     USER = "user"
     ASSISTANT = "assistant"
+    SYSTEM = "system"
 
 
 @dataclass(slots=True)

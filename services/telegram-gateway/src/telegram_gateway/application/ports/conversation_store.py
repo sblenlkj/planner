@@ -1,24 +1,24 @@
-from typing import Protocol
+from uuid import UUID
 
 from telegram_gateway.domain.models import ConversationMessage
 
 
-class ConversationStore(Protocol):
-    async def get_messages(
+class ConversationStore:
+    async def append_message(
         self,
-        telegram_chat_id: int,
+        business_user_id: UUID,
+        message: ConversationMessage,
     ) -> list[ConversationMessage]:
         raise NotImplementedError
 
-    async def append_message(
+    async def get_messages(
         self,
-        telegram_chat_id: int,
-        message: ConversationMessage,
-    ) -> None:
+        business_user_id: UUID,
+    ) -> list[ConversationMessage]:
         raise NotImplementedError
 
     async def clear_messages(
         self,
-        telegram_chat_id: int,
+        business_user_id: UUID,
     ) -> None:
         raise NotImplementedError

@@ -32,6 +32,13 @@ from backend.shared.auth import JwtTokenService
 from backend.shared.security.password_hashing import PasswordHasher
 
 
+from backend.context.runtime.adapters.agent_server_adapter import (
+    HttpAgentServerAdapter,
+)
+from backend.context.runtime.application.ports.agent_server_port import (
+    AgentServerPort,
+)
+
 AGENT_EXTRACTED_OBSERVATIONS_OFFSET_KEY = (
     "runtime:streams:planner.agent.observations.extracted:last_id"
 )
@@ -75,6 +82,11 @@ def build_container() -> Container:
         day_generation_requested_stream_name=settings.agent_day_generation_requested_stream,
     )
 
+    agent_server_adapter = HttpAgentServerAdapter(
+        morning_briefing_url=settings.agent_server_morning_briefing_url,
+        internal_api_token=settings.internal_api_token,
+    )
+
     return Container.from_mapping(
         {
             PasswordHasher: PasswordHasher(),
@@ -83,5 +95,6 @@ def build_container() -> Container:
             TelegramGatewayPort: telegram_gateway_adapter,
             ObservationStreamPort: observation_stream_adapter,
             DayGenerationStreamPort: day_generation_stream_adapter,
+            AgentServerPort: agent_server_adapter,
         }
     )

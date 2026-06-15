@@ -75,9 +75,9 @@ class RecoverActiveFutureRemindersCommandHandler(AbstractCommandHandler):
     @staticmethod
     def _resolve_now_utc(now_utc: datetime | None) -> datetime:
         if now_utc is None:
-            return datetime.now(UTC)
+            return datetime.now(UTC).replace(tzinfo=None)
 
         if now_utc.tzinfo is None:
-            return now_utc.replace(tzinfo=UTC)
+            return now_utc
 
-        return now_utc.astimezone(UTC)
+        return now_utc.astimezone(UTC).replace(tzinfo=None)

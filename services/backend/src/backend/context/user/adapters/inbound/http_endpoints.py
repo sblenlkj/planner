@@ -32,3 +32,6 @@ class UserHttpEndpoints:
     
     def update_user_last_session_at(self, *, user_id: UUID | str) -> str:
         return f"{self.base_url}/users/{user_id}/last-session-at"
+    
+    def get_user(self, *, user_id: UUID | str) -> str:
+        return f"{self.base_url}/users/{user_id}"

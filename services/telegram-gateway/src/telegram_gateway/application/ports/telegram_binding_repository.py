@@ -1,11 +1,19 @@
-from typing import Protocol
 from uuid import UUID
 
 from telegram_gateway.domain.models import TelegramBinding
 
 
-class TelegramBindingRepository(Protocol):
-    async def add(self, binding: TelegramBinding) -> None:
+class TelegramBindingRepository:
+    async def add(
+        self,
+        binding: TelegramBinding,
+    ) -> None:
+        raise NotImplementedError
+
+    async def upsert(
+        self,
+        binding: TelegramBinding,
+    ) -> None:
         raise NotImplementedError
 
     async def get_by_telegram_user_id(

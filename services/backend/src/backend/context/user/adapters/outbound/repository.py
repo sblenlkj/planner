@@ -38,6 +38,15 @@ class SqlAlchemyUserRepository(UserRepository):
         runtime_profile = UserRuntimeProfile.create_for_user(user_id=user.id)
         self._session.add(self._to_runtime_profile_row(runtime_profile))
 
+        await self._session.flush()
+
+        preferences = UserPreferences.create(
+            user_id=user.id,
+            language="ru",
+            utc_offset_minutes=180,
+        )
+        self._session.add(self._to_preferences_row(preferences))
+
     async def add_admin(
         self,
         *,
