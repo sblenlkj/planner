@@ -1,8 +1,15 @@
+from __future__ import annotations
+
 from datetime import datetime
+from typing import Any
 from uuid import UUID
 
 import httpx
 
+from telegram_gateway.application.errors import (
+    AgentInputBlockedError,
+    AgentResponseError,
+)
 from telegram_gateway.application.ports.agent_client import AgentClient
 from telegram_gateway.domain.models import ConversationMessage
 
@@ -35,7 +42,8 @@ class HttpAgentClient(AgentClient):
                 },
             )
 
-        response.raise_for_status()
+        self._ensure_success(response)
+
         payload = response.json()
         return payload.get("assistant_text")
 
@@ -55,7 +63,41 @@ class HttpAgentClient(AgentClient):
                 },
             )
 
-        response.raise_for_status()
+        self._ensure_success(response)
+
+    def _ensure_success(self, response: httpx.Response) -> None:
+        if response.status_code < 400:
+            return
+
+        payload = self._safe_json(response)
+
+        if response.status_code == 403:
+            error = payload.get("error") if isinstance(payload, dict) else None
+
+            if isinstance(error, dict) and error.get("code") == "input_guard_blocked":
+                violations = error.get("violations")
+                raise AgentInputBlockedError(
+                    error.get(
+                        "message",
+                        "User message was blocked by Agent Server input guard.",
+                    ),
+                    violations=violations if isinstance(violations, list) else [],
+                )
+
+        raise AgentResponseError(
+            f"Agent Server returned {response.status_code}: {response.text}"
+        )
+
+    def _safe_json(self, response: httpx.Response) -> dict[str, Any] | list[Any] | None:
+        try:
+            payload = response.json()
+        except ValueError:
+            return None
+
+        if isinstance(payload, (dict, list)):
+            return payload
+
+        return None
 
     def _headers(
         self,

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from langchain_gigachat.chat_models import GigaChat
 
 from .adapters import GigaChatConnectionConfig, GigaChatConnectionFactory
 from agent.core.settings import LlmModelKind
@@ -53,7 +53,7 @@ class AcquiredLlmSlot:
     slot_id: str
     model_kind: LlmModelKind
     model: str
-    llm: Any | None
+    llm: GigaChat | None
 
     def close(self) -> None:
         self.llm = None

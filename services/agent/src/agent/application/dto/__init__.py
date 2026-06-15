@@ -1,10 +1,21 @@
-from .analytics import AnalyticsInsightDto, AnalyticsObservationDto
-from .course import CourseDto, CourseObservationDto, CourseTaskDto, CourseTaskObservationDto
-from .schedule import DeadlineDto, ReminderDto, ScheduleDateObservationDto, ScheduleDayObservationDto
-from .user import UserProfileDto
+from agent.application.dto.agent_context import AgentPlannerContextDto
+from agent.application.dto.analytics import AnalyticsObservationDto
+from agent.application.dto.course import (
+    CourseDto,
+    CourseObservationDto,
+    CourseTaskDto,
+    CourseTaskObservationDto,
+)
+from agent.application.dto.schedule import (
+    DeadlineDto,
+    ReminderDto,
+    ScheduleDateObservationDto,
+    ScheduleDayObservationDto,
+)
+from agent.application.dto.user import UserProfileDto
 
 __all__ = [
-    "AnalyticsInsightDto",
+    "AgentPlannerContextDto",
     "AnalyticsObservationDto",
     "CourseDto",
     "CourseObservationDto",

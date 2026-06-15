@@ -3,9 +3,6 @@ from uuid import UUID
 from telegram_gateway.application.errors import TelegramBindingNotFoundError
 from telegram_gateway.application.ports.agent_client import AgentClient
 from telegram_gateway.application.ports.conversation_store import ConversationStore
-from telegram_gateway.application.ports.telegram_message_sender import (
-    TelegramMessageSender,
-)
 from telegram_gateway.application.ports.unit_of_work import UnitOfWork
 from telegram_gateway.domain.models import ConversationMessage, ConversationMessageRole
 from telegram_gateway.logging import get_logger
@@ -46,17 +43,22 @@ class SendAgentMessage:
                 f"Telegram binding was not found for business_user_id={business_user_id}"
             )
 
-        messages = await self._conversation_store.append_message(
-            business_user_id=business_user_id,
-            message=ConversationMessage(
-                role=ConversationMessageRole.USER,
-                content=text,
-            ),
+        user_message = ConversationMessage(
+            role=ConversationMessageRole.USER,
+            content=text,
         )
+
+        # Important:
+        # Do not append user message to Redis before Agent Server accepts it.
+        # If Agent Server rejects input by security policy, the session must stay clean.
+        existing_messages = await self._conversation_store.get_messages(
+            business_user_id=business_user_id,
+        )
+        messages_for_agent = [*existing_messages, user_message]
 
         assistant_text = await self._agent_client.handle_messages(
             business_user_id=business_user_id,
-            messages=messages,
+            messages=messages_for_agent,
         )
 
         if assistant_text is None:
@@ -67,6 +69,11 @@ class SendAgentMessage:
                 assistant_text_exists=False,
             )
             return None
+
+        await self._conversation_store.append_message(
+            business_user_id=business_user_id,
+            message=user_message,
+        )
 
         await self._conversation_store.append_message(
             business_user_id=business_user_id,
