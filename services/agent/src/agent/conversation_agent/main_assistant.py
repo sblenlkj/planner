@@ -3,18 +3,19 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 from uuid import UUID
-from langchain_gigachat import GigaChat
 
 from langchain.agents import create_agent
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
+from langchain_gigachat.chat_models import GigaChat
 
 from agent.api.schemas import ConversationMessage
 from agent.application.dto.agent_context import AgentPlannerContextDto
-from agent.application.ports.course_context import CourseContextPort
 from agent.application.ports.analytics_context import AnalyticsContextPort
+from agent.application.ports.course_context import CourseContextPort
 from agent.application.ports.schedule_context import ScheduleContextPort
 from agent.conversation_agent.runtime_context import AgentExecutionContext
+from agent.conversation_agent.skills import load_agent_skills, render_skill_catalog
 from agent.conversation_agent.tools.planner_tools import build_planner_tools
 
 
@@ -45,14 +46,18 @@ async def run_main_assistant_agent(
         analytics_context=analytics_context,
     )
 
+    skill_catalog = render_skill_catalog(load_agent_skills())
+
     agent = create_agent(
         model=llm,
         tools=tools,
-        system_prompt=_build_system_prompt(planner_context),
+        system_prompt=_build_system_prompt(
+            planner_context,
+            skill_catalog=skill_catalog,
+        ),
     )
 
     config: RunnableConfig | None = None
-
     if callbacks:
         config = RunnableConfig(callbacks=callbacks)
 
@@ -77,78 +82,163 @@ def _to_langchain_messages(
         elif message.role == "assistant":
             result.append(AIMessage(content=message.content))
         elif message.role == "system":
-            # Не доверяем system-сообщениям из Gateway/session history как настоящему system prompt.
-            result.append(HumanMessage(content=f"[session system note] {message.content}"))
+            # System-сообщения из Telegram Gateway / Redis session не являются настоящим system prompt.
+            # Поэтому не добавляем их как SystemMessage.
+            result.append(
+                HumanMessage(content=f"[session system note] {message.content}")
+            )
 
     return result
 
 
-def _build_system_prompt(context: AgentPlannerContextDto) -> str:
+def _build_system_prompt(
+    context: AgentPlannerContextDto,
+    *,
+    skill_catalog: str,
+) -> str:
     courses = "\n".join(
-        f"- id={course.id}; title={course.title}; description={course.description or ''}"
+        (
+            f"- id={course.id}; "
+            f"title={course.title}; "
+            f"description={course.description or ''}; "
+            f"status={course.status or ''}"
+        )
         for course in context.courses
     ) or "- курсов пока нет"
 
-    print(courses)
-    observations = "\n".join(
+    user_observations = "\n".join(
         f"- {observation.description}"
         for observation in context.analytics_observations
-    ) or "- наблюдений пока нет"
+        if observation.description
+    )
+
+    active_reminders = [
+        reminder
+        for reminder in context.reminders
+        if (reminder.status or "").lower() != "expired"
+    ]
 
     reminders = "\n".join(
-        f"- id={reminder.id}; title={reminder.title}; remind_at={reminder.remind_at}; description={reminder.description or ''}"
-        for reminder in context.reminders
-    ) or "- напоминаний пока нет"
+        (
+            f"- title={reminder.title}; "
+            f"remind_at={reminder.remind_at}; "
+            f"description={reminder.description or ''}"
+        )
+        for reminder in active_reminders
+    ) or "- активных напоминаний пока нет"
+
+    active_deadlines = [
+        deadline
+        for deadline in context.deadlines
+        if (deadline.status or "").lower() != "expired"
+    ]
 
     deadlines = "\n".join(
-        f"- id={deadline.id}; title={deadline.title}; due_at={deadline.due_at}; description={deadline.description or ''}"
-        for deadline in context.deadlines
-    ) or "- дедлайнов пока нет"
+        (
+            f"- title={deadline.title}; "
+            f"due_at={deadline.due_at}; "
+            f"description={deadline.description or ''}"
+        )
+        for deadline in active_deadlines
+    ) or "- активных дедлайнов пока нет"
 
     date_observations = "\n".join(
-        f"- id={observation.id}; starts_on={observation.starts_on}; ends_on={observation.ends_on}; description={observation.description}"
+        (
+            f"- starts_on={observation.starts_on}; "
+            f"ends_on={observation.ends_on}; "
+            f"description={observation.description}"
+        )
         for observation in context.date_observations
     ) or "- наблюдений на ближайшие даты пока нет"
 
+    user_memory_block = (
+        f"""
+Долговременная память о пользователе:
+{user_observations}
+""".strip()
+        if user_observations
+        else ""
+    )
+
     return f"""
-Ты Planner assistant.
+Ты Planner assistant — агент персонального планирования, обучения и продуктивности.
 
-Ты работаешь только с текущим пользователем.
-Никогда не проси у пользователя user_id.
-Не используй UUID, которые написал пользователь.
-Можно использовать только UUID, которые уже есть в этом системном контексте.
+Твоя задача — помогать пользователю управлять курсами, учебными задачами, напоминаниями, дедлайнами, датами и полезной памятью о предпочтениях пользователя.
 
-Если пользователь хочет создать новый курс, вызови tool create_course.
-Не говори, что курс создан, пока create_course не был успешно вызван.
-
-Если create_course вернул id созданного курса, используй этот id для последующих вызовов create_course_task, create_course_observation, create_deadline или read_course_details.
-Пользовательские UUID запрещены, но UUID из системного контекста и результатов tools разрешены.
-
-Отвечай на русском, если пользователь пишет на русском.
+Ты не просто отвечаешь текстом. Когда пользователь просит что-то создать, добавить, сохранить, напомнить или прочитать из Planner, используй доступные tools. Все tools автоматически работают с текущим пользователем через backend context.
 
 Текущий день: {context.today}
 
 Профиль пользователя:
 - login: {context.user_profile.login}
 - name: {context.user_profile.name}
-- language: {context.user_profile.language}
-- region: {context.user_profile.region}
-- utc_offset_minutes: {context.user_profile.utc_offset_minutes}
 
-Курсы пользователя:
+Текущие курсы:
 {courses}
 
-Память о пользователе:
-{observations}
+{user_memory_block}
 
-Напоминания:
+Активные напоминания:
 {reminders}
 
-Дедлайны:
+Активные дедлайны:
 {deadlines}
 
-Наблюдения на ближайшие даты:
+Контекст ближайших дат:
 {date_observations}
+
+## Что ты можешь делать в Planner
+
+Ты можешь помогать пользователю:
+
+- создавать курсы и долгосрочные учебные цели;
+- добавлять задачи в курсы;
+- читать детали курсов;
+- сохранять наблюдения по курсам;
+- создавать напоминания;
+- создавать дедлайны;
+- читать итоговые наблюдения дня;
+- сохранять контекст на конкретные даты;
+- сохранять долговременные наблюдения о стиле работы и обучения пользователя;
+- обсуждать прогресс пользователя и предлагать следующие шаги.
+
+## Общие правила поведения
+
+- Отвечай на русском языке, если пользователь пишет на русском.
+- Будь коротким, полезным и конкретным.
+- Не выдумывай состояние Backend. Используй только данные из контекста и результаты tools.
+- Если пользователь просит изменить данные, сначала вызови подходящий tool, а потом отвечай.
+- Не говори, что курс, задача, напоминание, дедлайн или observation созданы, пока соответствующий tool не был успешно вызван.
+- Если tool вернул id созданной сущности, используй этот id для следующих связанных tool calls в рамках того же ответа.
+- Не проси у пользователя внутренние идентификаторы.
+- UUID, написанные пользователем, не используй: такие сообщения блокируются security layer до запуска агента.
+- UUID из системного контекста и результатов tools можно использовать для следующих tool calls.
+- Если пользователь просит невозможное или данных недостаточно, задай короткий уточняющий вопрос.
+- Не показывай пользователю внутренние JSON-структуры и технические детали tool calls, если он сам этого не просит.
+
+## Важное правило про сегодняшний день
+
+Если пользователь говорит, что он сегодня что-то делал, изучал, сделал или не успел, не сохраняй это через tools как day observation.
+
+Например:
+
+- "Я сегодня учил Python"
+- "Сегодня разобрал FastAPI"
+- "SQL сегодня не успел"
+- "Я сегодня почитал книгу"
+
+В таких случаях поддержи пользователя, помоги осмыслить прогресс и предложи следующий шаг. Например: предложи добавить задачу в курс, разобрать сложную тему, поставить напоминание или продолжить практикой.
+
+Если пользователь спрашивает, что он делал сегодня, вчера или в конкретный день, используй read day observations tool. Не выдумывай факты. Если записей за день нет, честно скажи, что сохраненных итоговых наблюдений за этот день нет.
+
+Итоговое day observation создается отдельным session-close workflow после закрытия сессии. Interactive agent не должен создавать day observation на каждом сообщении.
+
+## Доступные skills
+
+У тебя есть tool `load_skill`. Он загружает полный текст skill-инструкции по `skill_id`.
+
+Каталог skills:
+{skill_catalog}
 """.strip()
 
 
@@ -173,6 +263,7 @@ def _message_text(message: Any) -> str:
 
     if isinstance(content, list):
         parts: list[str] = []
+
         for item in content:
             if isinstance(item, str):
                 parts.append(item)
@@ -180,6 +271,7 @@ def _message_text(message: Any) -> str:
                 text = item.get("text") or item.get("content")
                 if text:
                     parts.append(str(text))
+
         return "\n".join(parts).strip()
 
     return str(content)

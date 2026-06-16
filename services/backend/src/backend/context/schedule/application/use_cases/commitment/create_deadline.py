@@ -39,7 +39,7 @@ class CreateDeadlineCommandHandler(AbstractCommandHandler):
         deadline = Deadline(
             id=deadline_id,
             user_id=command.user_id,
-            due_at=command.due_at,
+            due_at=self._to_utc(local_datetime=command.due_at),
             title=command.title,
             description=command.description,
             course_id=None,
@@ -53,3 +53,31 @@ class CreateDeadlineCommandHandler(AbstractCommandHandler):
         return CreateDeadlineCommandResult(
             deadline_id=deadline_id,
         )
+    
+    @staticmethod
+    def _to_utc(
+        *,
+        local_datetime: datetime,
+    ) -> datetime:
+        # Contract:
+        # utc_offset_minutes is the user's standard offset from UTC.
+        #
+        # Examples:
+        # UTC+3  -> +180
+        # UTC-5  -> -300
+        #
+        # Conversion:
+        # local time -> UTC time
+        # UTC = local - offset
+        #
+        # Example:
+        # local_datetime=2026-06-16 09:30:00
+        # utc_offset_minutes=180
+        # stored UTC=2026-06-16 06:30:00
+        #
+        # Database stores UTC as TIMESTAMP WITHOUT TIME ZONE.
+        # If datetime has tzinfo, ignore tzinfo and treat wall time as user-local.
+
+        local_naive = local_datetime.replace(tzinfo=None)
+
+        return local_naive

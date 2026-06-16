@@ -11,6 +11,15 @@ from agent.application.ports.course_context import CourseContextPort
 from agent.application.ports.schedule_context import ScheduleContextPort
 from agent.conversation_agent.runtime_context import AgentExecutionContext
 
+from agent.conversation_agent.skills import get_agent_skill
+
+class LoadSkillArgs(BaseModel):
+    skill_id: str = Field(
+        description=(
+            "Идентификатор skill из skill catalog. "
+            "Например: course_planning или user_memory."
+        )
+    )
 
 class CreateCourseArgs(BaseModel):
     title: str = Field(description="Название курса, который нужно создать.")
@@ -124,6 +133,23 @@ class ReadCourseDetailsArgs(BaseModel):
         description="Нужно ли читать задачи курса.",
     )
 
+class ReadDayObservationsArgs(BaseModel):
+    day: str = Field(
+        description=(
+            "День, за который нужно прочитать итоговые day observations, "
+            "в формате YYYY-MM-DD. Если пользователь спрашивает про сегодня, "
+            "используй текущий день из system context."
+        ),
+    )
+
+async def load_skill(skill_id: str) -> str:
+    skill = get_agent_skill(skill_id)
+
+    return (
+        f"# {skill.title}\n\n"
+        f"Описание: {skill.description}\n\n"
+        f"{skill.body}"
+    )
 
 def build_planner_tools(
     *,
@@ -283,6 +309,34 @@ def build_planner_tools(
             f"title: {observation.title or ''}\n"
             f"description: {observation.description}"
         )
+    
+    async def read_day_observations(
+        day: str,
+    ) -> str:
+        target_date = _parse_date(day)
+
+        observations = await schedule_context.list_schedule_day_observations(
+            execution_context.business_user_id,
+            date_=target_date,
+        )
+
+        if not observations:
+            return (
+                "За этот день day observations не найдены.\n"
+                f"day: {target_date.isoformat()}\n"
+                "Я не знаю, что пользователь делал в этот день."
+            )
+
+        items = "\n".join(
+            f"- id={observation.id}; description={observation.description}"
+            for observation in observations
+        )
+
+        return (
+            "Day observations найдены.\n"
+            f"day: {target_date.isoformat()}\n"
+            f"{items}"
+        )
 
     async def read_course_details(
         course_id: str,
@@ -372,6 +426,25 @@ def build_planner_tools(
                 "Используй, когда пользователь спрашивает состояние или детали курса."
             ),
             args_schema=ReadCourseDetailsArgs,
+        ),
+        StructuredTool.from_function(
+            coroutine=load_skill,
+            name="load_skill",
+            description=(
+                "Загружает полный текст skill-инструкции по skill_id из skill catalog. "
+                "Используй перед сложными действиями, если нужно уточнить правила работы с курсами, памятью или другими сценариями."
+            ),
+            args_schema=LoadSkillArgs,
+        ),
+        StructuredTool.from_function(
+            coroutine=read_day_observations,
+            name="read_day_observations",
+            description=(
+                "Читает итоговые day observations пользователя за конкретную дату. "
+                "Используй, когда пользователь спрашивает, что он делал сегодня, вчера "
+                "или в конкретный день. Этот tool ничего не создает."
+            ),
+            args_schema=ReadDayObservationsArgs,
         ),
     ]
 

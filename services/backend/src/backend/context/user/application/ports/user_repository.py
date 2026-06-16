@@ -18,6 +18,7 @@ class UserRepository(Protocol):
         self,
         *,
         user: User,
+        utc_offset_minutes: int,
     ) -> None:
         raise NotImplementedError
 

@@ -60,6 +60,11 @@ class CreateReminderCommandHandler(AbstractCommandHandler):
             user_id=command.user_id,
         )
 
+        print(
+            f"utc_offset_minutes: {utc_offset_minutes}",
+            f"remind_at: {command.remind_at}",
+        )
+
         remind_at_utc = self._to_utc(
             local_datetime=command.remind_at,
             utc_offset_minutes=utc_offset_minutes,
@@ -101,14 +106,25 @@ class CreateReminderCommandHandler(AbstractCommandHandler):
         local_datetime: datetime,
         utc_offset_minutes: int,
     ) -> datetime:
-        # MVP rule:
-        # API may receive timezone-aware UTC datetime from Agent Server.
-        # Database stores UTC as TIMESTAMP WITHOUT TIME ZONE.
+        # Contract:
+        # utc_offset_minutes is the user's standard offset from UTC.
         #
-        # Therefore we normalize to UTC and strip tzinfo before persistence.
+        # Examples:
+        # UTC+3  -> +180
+        # UTC-5  -> -300
+        #
+        # Conversion:
+        # local time -> UTC time
+        # UTC = local - offset
+        #
+        # Example:
+        # local_datetime=2026-06-16 09:30:00
+        # utc_offset_minutes=180
+        # stored UTC=2026-06-16 06:30:00
+        #
+        # Database stores UTC as TIMESTAMP WITHOUT TIME ZONE.
+        # If datetime has tzinfo, ignore tzinfo and treat wall time as user-local.
 
-        if local_datetime.tzinfo is not None:
-            return local_datetime.astimezone(UTC).replace(tzinfo=None)
+        local_naive = local_datetime.replace(tzinfo=None)
 
-        # Naive datetime is treated as already UTC.
-        return local_datetime
+        return local_naive - timedelta(minutes=utc_offset_minutes)

@@ -16,7 +16,9 @@ from backend.context.user.application.errors import UserLoginAlreadyTakenError
 @dataclass(frozen=True, kw_only=True)
 class CreateUserCommand(Command):
     password: str
-    login: str | None = None
+    login: str
+    name: str
+    utc_offset_minutes: int
     id: UUID | None = None
 
 
@@ -47,9 +49,10 @@ class CreateUserCommandHandler(AbstractCommandHandler):
         user = User.create_user(
             id=user_id,
             login=command.login,
+            name=command.name,
             password_hash=password_hash,
         )
 
-        await context.uow.users.add_user(user=user)
+        await context.uow.users.add_user(user=user, utc_offset_minutes=command.utc_offset_minutes)
 
         return CreateUserCommandResult(user_id=user_id)

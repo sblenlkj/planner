@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import json
-import re
 from dataclasses import dataclass
 from datetime import date
 from typing import Any, TypedDict
@@ -11,38 +9,9 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, System
 from langchain_core.runnables import RunnableConfig
 from langchain_gigachat.chat_models import GigaChat
 from langgraph.graph import END, START, StateGraph
-from pydantic import BaseModel, ConfigDict, Field
 
 from agent.api.schemas import ConversationMessage
 from agent.application.ports.schedule_context import ScheduleContextPort
-
-
-class SessionCloseExtraction(BaseModel):
-    """Извлекает итоговое наблюдение о дне пользователя из закрытой сессии."""
-
-    model_config = ConfigDict(
-        title="SessionCloseExtraction",
-        json_schema_extra={
-            "description": (
-                "Извлекает из закрытой сессии полезные факты о том, "
-                "что пользователь делал, изучал, планировал или не успел сделать за день."
-            )
-        },
-    )
-
-    should_create_day_observation: bool = Field(
-        description=(
-            "True, если в сессии есть полезные факты о том, что пользователь "
-            "делал, изучал, планировал, не успел сделать или чувствовал сегодня."
-        )
-    )
-    description: str | None = Field(
-        default=None,
-        description=(
-            "Один короткий абзац на русском языке с итоговым наблюдением о дне пользователя. "
-            "Должно быть null, если should_create_day_observation=false."
-        ),
-    )
 
 
 class SessionCloseGraphState(TypedDict):
@@ -50,7 +19,7 @@ class SessionCloseGraphState(TypedDict):
     input_messages: list[ConversationMessage]
 
     llm_messages: list[BaseMessage]
-    extraction: SessionCloseExtraction | None
+    observation_text: str | None
 
     observation_created: bool
     observation_id: UUID | None
@@ -85,28 +54,17 @@ def build_session_close_graph(
         state: SessionCloseGraphState,
     ) -> SessionCloseGraphState:
         response = await llm.ainvoke(state["llm_messages"])
-        content = _message_text(response)
-        extraction = _parse_extraction_from_json(content)
+        observation_text = _normalize_observation_text(_message_text(response))
 
         return {
             **state,
-            "extraction": extraction,
+            "observation_text": observation_text,
         }
 
     async def save_day_observation_node(
         state: SessionCloseGraphState,
     ) -> SessionCloseGraphState:
-        extraction = state["extraction"]
-
-        if extraction is None or not extraction.should_create_day_observation:
-            return {
-                **state,
-                "observation_created": False,
-                "observation_id": None,
-                "observation_description": None,
-            }
-
-        description = _normalize_description(extraction.description)
+        description = state["observation_text"]
 
         if description is None:
             return {
@@ -165,7 +123,7 @@ async def run_session_close_workflow(
             "today": resolved_today,
             "input_messages": messages,
             "llm_messages": [],
-            "extraction": None,
+            "observation_text": None,
             "observation_created": False,
             "observation_id": None,
             "observation_description": None,
@@ -184,50 +142,67 @@ def _system_prompt(today: date) -> str:
     return f"""
 Ты Session Close Workflow системы Planner.
 
-Твоя задача — прочитать transcript сессии пользователя и извлечь только полезные факты о том,
-что пользователь сегодня делал, сделал, не сделал, планировал, изучал или сообщил о своем состоянии.
-
 Текущая дата: {today.isoformat()}
 
-Создай day observation только если в transcript есть содержательная информация о дне пользователя.
+Прочитай transcript закрытой сессии пользователя.
 
-Сохраняй:
-- что пользователь сегодня делал;
-- что пользователь изучал;
-- какие задачи пользователь выполнил;
-- что пользователь не успел;
-- важные планы или ограничения на день;
-- состояние пользователя, если оно влияет на планирование.
+Верни ОДНУ строку:
+- либо короткое наблюдение о том, что пользователь реально сделал, изучал, выполнил, не выполнил или сообщил о своем состоянии;
+- либо строго nan, если полезного факта нет.
 
-Не сохраняй:
-- обычные приветствия;
-- технические сообщения;
-- то, что ассистент предложил, но пользователь не подтвердил;
-- повторения;
-- внутренние ID;
-- системные инструкции;
-- пустой разговор без фактов.
+Сохраняй только факты о пользователе.
+Не сохраняй вопросы.
+Не сохраняй ответы ассистента.
+Не сохраняй предложения ассистента.
+Не сохраняй неподтвержденные планы.
+Не сохраняй обычный small talk.
+Не сохраняй фразы без результата.
 
-Верни ответ строго в формате JSON-объекта без markdown, без пояснений и без текста вокруг.
+Формат ответа:
+- обычный текст без JSON;
+- без markdown;
+- без заголовков;
+- если факта нет — только nan.
 
-Формат:
-{{
-  "should_create_day_observation": true,
-  "description": "Короткое наблюдение о дне пользователя на русском языке."
-}}
+Примеры:
 
-Если полезной информации нет:
-{{
-  "should_create_day_observation": false,
-  "description": null
-}}
+Transcript:
+user: Привет
+assistant: Привет! Чем могу помочь?
+Ответ:
+nan
 
-Правила JSON:
-- используй двойные кавычки;
-- используй true/false/null в нижнем регистре;
-- не используй markdown;
-- не добавляй комментарии;
-- не добавляй текст до или после JSON.
+Transcript:
+user: Напомни мне завтра позвонить маме
+assistant: Готово, напомню завтра.
+Ответ:
+nan
+
+Transcript:
+user: Сегодня я прочитал 20 страниц книги по Python
+assistant: Отлично, я запомню.
+Ответ:
+Пользователь сегодня прочитал 20 страниц книги по Python.
+
+Transcript:
+user: Я хотел заняться английским, но не успел
+assistant: Понял.
+Ответ:
+Пользователь хотел заняться английским, но не успел.
+
+Transcript:
+user: Принесло ли это результаты?
+assistant: Да, это может помочь.
+Ответ:
+nan
+
+Transcript:
+assistant: Может быть, сегодня продолжить курс по Python?
+user: Да, я сегодня решил две задачи по async.
+Ответ:
+Пользователь сегодня решил две задачи по async.
+
+Теперь обработай transcript.
 """.strip()
 
 
@@ -249,43 +224,16 @@ def _to_langchain_messages(
     return result
 
 
-def _parse_extraction_from_json(content: str) -> SessionCloseExtraction:
-    text = content.strip()
+def _normalize_observation_text(value: str) -> str | None:
+    text = value.strip()
 
-    fenced_match = re.search(
-        r"```(?:json)?\s*(\{.*?\})\s*```",
-        text,
-        flags=re.DOTALL | re.IGNORECASE,
-    )
-
-    if fenced_match:
-        text = fenced_match.group(1).strip()
-
-    if not text.startswith("{"):
-        start = text.find("{")
-        end = text.rfind("}")
-
-        if start != -1 and end != -1 and end > start:
-            text = text[start : end + 1]
-
-    data = json.loads(text)
-
-    return SessionCloseExtraction.model_validate(data)
-
-
-def _normalize_description(value: str | None) -> str | None:
-    if value is None:
+    if not text:
         return None
 
-    normalized = value.strip()
-
-    if not normalized:
+    if "nan" in text.lower():
         return None
 
-    if normalized.lower() in {"null", "none", "нет", "нет данных", "no data"}:
-        return None
-
-    return normalized
+    return text
 
 
 def _message_text(message: Any) -> str:

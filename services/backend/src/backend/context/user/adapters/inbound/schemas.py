@@ -9,7 +9,9 @@ from backend.context.user.domain.user_runtime_profile import UserRuntimeStatus
 
 class CreateUserRequest(BaseModel):
     password: str = Field(min_length=1)
-    login: str | None = None
+    name: str = Field(min_length=1)
+    utc_offset_minutes: int
+    login: str
 
 
 class CreateUserResponse(BaseModel):

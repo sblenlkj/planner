@@ -72,6 +72,11 @@ class ListUserCommitmentsQueryHandler(AbstractQueryHandler):
                 status=query.status,
             )
 
+            for r in reminders:
+                print(r)
+                r.reschedule_with_utc_offset(utc_offset_minutes=180) # TODO 
+                print(r)
+
         if query.kind is None or query.kind == CommitmentKindFilter.DEADLINE:
             deadlines = await context.uow.commitment_reader.list_deadlines(
                 user_id=query.user_id,

@@ -29,6 +29,7 @@ class SqlAlchemyUserRepository(UserRepository):
         self,
         *,
         user: User,
+        utc_offset_minutes: int,
     ) -> None:
         if user.role != UserRole.USER:
             raise ValueError("Only regular users can be persisted through add_user.")
@@ -42,8 +43,8 @@ class SqlAlchemyUserRepository(UserRepository):
 
         preferences = UserPreferences.create(
             user_id=user.id,
-            language="ru",
-            utc_offset_minutes=180,
+            utc_offset_minutes=utc_offset_minutes,
+            language='ru',
         )
         self._session.add(self._to_preferences_row(preferences))
 

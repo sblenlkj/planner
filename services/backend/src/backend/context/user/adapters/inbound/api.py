@@ -89,6 +89,8 @@ async def create_user(
             CreateUserCommand(
                 password=request.password,
                 login=request.login,
+                name=request.name,
+                utc_offset_minutes=request.utc_offset_minutes,
             )
         )
     except Exception as error:

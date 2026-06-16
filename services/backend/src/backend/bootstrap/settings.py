@@ -105,7 +105,7 @@ class Settings(BaseSettings):
 
     @property
     def telegram_gateway_send_message_url(self) -> str:
-        return f"{self.telegram_gateway_base_url}/internal/messages/send"
+        return f"{self.telegram_gateway_base_url}/telegram/notifications/send"
 
     @property
     def telegram_gateway_close_conversation_url(self) -> str:

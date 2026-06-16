@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from uuid import UUID, uuid4
+from datetime import UTC, datetime, timedelta
 
 from ..value_objects import CommitmentStatus
 
@@ -63,3 +64,15 @@ class Reminder:
 
         if value.utcoffset() != UTC.utcoffset(value):
             raise ValueError(f"{field_name} must be UTC datetime or naive UTC datetime")
+        
+    def reschedule_with_utc_offset(
+        self,
+        *,
+        utc_offset_minutes: int,
+    ) -> None:
+        remind_at_utc = self.remind_at + timedelta(minutes=utc_offset_minutes)
+
+        if remind_at_utc.tzinfo is None:
+            remind_at_utc = remind_at_utc.replace(tzinfo=UTC)
+
+        self.reschedule(remind_at_utc)
