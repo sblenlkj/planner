@@ -289,26 +289,26 @@ def build_planner_tools(
             f"description: {observation.description}"
         )
 
-    async def create_course_observation(
-        course_id: str,
-        title: str,
-        description: str,
-    ) -> str:
-        parsed_course_id = _parse_uuid(course_id, field_name="course_id")
+    # async def create_course_observation(
+    #     course_id: str,
+    #     title: str,
+    #     description: str,
+    # ) -> str:
+    #     parsed_course_id = _parse_uuid(course_id, field_name="course_id")
 
-        observation = await course_context.create_course_observation(
-            parsed_course_id,
-            title=title,
-            description=description,
-        )
+    #     observation = await course_context.create_course_observation(
+    #         parsed_course_id,
+    #         title=title,
+    #         description=description,
+    #     )
 
-        return (
-            "Наблюдение по курсу сохранено.\n"
-            f"id: {observation.id}\n"
-            f"course_id: {observation.course_id}\n"
-            f"title: {observation.title or ''}\n"
-            f"description: {observation.description}"
-        )
+    #     return (
+    #         "Наблюдение по курсу сохранено.\n"
+    #         f"id: {observation.id}\n"
+    #         f"course_id: {observation.course_id}\n"
+    #         f"title: {observation.title or ''}\n"
+    #         f"description: {observation.description}"
+    #     )
     
     async def read_day_observations(
         day: str,
@@ -409,24 +409,24 @@ def build_planner_tools(
             ),
             args_schema=CreateDateObservationArgs,
         ),
-        StructuredTool.from_function(
-            coroutine=create_course_observation,
-            name="create_course_observation",
-            description=(
-                "Сохраняет наблюдение по конкретному курсу. "
-                "Используй для прогресса, сложности, заметок и важных фактов о курсе."
-            ),
-            args_schema=CreateCourseObservationArgs,
-        ),
-        StructuredTool.from_function(
-            coroutine=read_course_details,
-            name="read_course_details",
-            description=(
-                "Читает подробности конкретного курса: задачи и наблюдения. "
-                "Используй, когда пользователь спрашивает состояние или детали курса."
-            ),
-            args_schema=ReadCourseDetailsArgs,
-        ),
+        # StructuredTool.from_function(
+        #     coroutine=create_course_observation,
+        #     name="create_course_observation",
+        #     description=(
+        #         "Сохраняет наблюдение по конкретному курсу. "
+        #         "Используй для прогресса, сложности, заметок и важных фактов о курсе."
+        #     ),
+        #     args_schema=CreateCourseObservationArgs,
+        # ),
+        # StructuredTool.from_function(
+        #     coroutine=read_course_details,
+        #     name="read_course_details",
+        #     description=(
+        #         "Читает подробности конкретного курса: задачи и наблюдения. "
+        #         "Используй, когда пользователь спрашивает состояние или детали курса."
+        #     ),
+        #     args_schema=ReadCourseDetailsArgs,
+        # ),
         StructuredTool.from_function(
             coroutine=load_skill,
             name="load_skill",
