@@ -35,6 +35,17 @@ class Settings(BaseSettings):
 
     http_timeout_seconds: float = Field(default=30.0, alias="HTTP_TIMEOUT_SECONDS")
     agent_http_timeout_seconds: float = Field(default=60.0, alias="AGENT_HTTP_TIMEOUT_SECONDS")
+    use_telegram: bool = Field(default=False, alias="USE_TELEGRAM")
+    telegram_webhook_public_url: str | None = Field(default=None, alias="TELEGRAM_WEBHOOK_PUBLIC_URL")
+    telegram_webhook_secret: str = Field(default="dima_telegram", alias="TELEGRAM_WEBHOOK_SECRET")
+    telegram_webhook_delete_on_shutdown: bool = Field(
+        default=False,
+        alias="TELEGRAM_WEBHOOK_DELETE_ON_SHUTDOWN",
+    )
+    telegram_update_deduplication_ttl_seconds: int = Field(
+        default=86400,
+        alias="TELEGRAM_UPDATE_DEDUPLICATION_TTL_SECONDS",
+    )
 
     @property
     def backend_base_url(self) -> str:
@@ -49,12 +60,26 @@ class Settings(BaseSettings):
         return f"{self.backend_base_url}/users/{{user_id}}"
 
     @property
+    def backend_create_user_url(self) -> str:
+        return f"{self.backend_base_url}/users"
+
+    @property
     def agent_handle_messages_url(self) -> str:
         return f"{self.agent_base_url}/internal/conversations/respond"
 
     @property
     def agent_close_session_url(self) -> str:
         return f"{self.agent_base_url}/internal/workflows/session-close/run"
+
+    @property
+    def telegram_webhook_url(self) -> str | None:
+        if not self.use_telegram or not self.telegram_webhook_public_url:
+            return None
+        return f"{self.telegram_webhook_public_url.rstrip('/')}/telegram/webhook"
+
+    @property
+    def should_delete_telegram_webhook_on_shutdown(self) -> bool:
+        return self.use_telegram and self.telegram_webhook_delete_on_shutdown
 
 
 @lru_cache(maxsize=1)

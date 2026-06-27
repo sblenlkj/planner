@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from telegram_gateway.domain.models import ConversationMessageRole
 
@@ -59,3 +59,29 @@ class ConversationMessageResponse(BaseModel):
 class GetAgentSessionResponse(BaseModel):
     ok: bool = True
     messages: list[ConversationMessageResponse]
+
+
+class TelegramUserSchema(BaseModel):
+    id: int
+    is_bot: bool | None = None
+    first_name: str | None = None
+    last_name: str | None = None
+    username: str | None = None
+    language_code: str | None = None
+
+
+class TelegramChatSchema(BaseModel):
+    id: int
+
+
+class TelegramMessageSchema(BaseModel):
+    message_id: int
+    date: int
+    text: str | None = None
+    from_user: TelegramUserSchema = Field(alias="from")
+    chat: TelegramChatSchema
+
+
+class TelegramUpdateSchema(BaseModel):
+    update_id: int
+    message: TelegramMessageSchema | None = None

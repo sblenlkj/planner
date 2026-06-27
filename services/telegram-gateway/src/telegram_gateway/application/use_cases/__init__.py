@@ -8,6 +8,10 @@ from telegram_gateway.application.use_cases.send_telegram_notification import (
     SendTelegramNotification,
 )
 from telegram_gateway.application.use_cases.get_agent_session import GetAgentSession
+from telegram_gateway.application.use_cases.handle_telegram_webhook_message import (
+    HandleTelegramWebhookMessage,
+    IncomingTelegramWebhookMessage,
+)
 
 __all__ = [
     "AttachTelegram",
@@ -16,4 +20,6 @@ __all__ = [
     "SendAgentMessage",
     "SendTelegramNotification",
     "GetAgentSession",
+    "HandleTelegramWebhookMessage",
+    "IncomingTelegramWebhookMessage",
 ]

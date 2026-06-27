@@ -2,12 +2,10 @@ import json
 from uuid import UUID
 
 from redis.asyncio import Redis
-
-from telegram_gateway.application.ports.conversation_store import ConversationStore
 from telegram_gateway.domain.models import ConversationMessage, ConversationMessageRole
 
 
-class RedisConversationStore(ConversationStore):
+class RedisConversationStore:
     def __init__(
         self,
         *,

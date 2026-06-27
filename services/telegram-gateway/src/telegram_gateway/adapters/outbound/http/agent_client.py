@@ -10,11 +10,10 @@ from telegram_gateway.application.errors import (
     AgentInputBlockedError,
     AgentResponseError,
 )
-from telegram_gateway.application.ports.agent_client import AgentClient
 from telegram_gateway.domain.models import ConversationMessage
 
 
-class HttpAgentClient(AgentClient):
+class HttpAgentClient:
     def __init__(
         self,
         *,
@@ -33,14 +32,19 @@ class HttpAgentClient(AgentClient):
         business_user_id: UUID,
         messages: list[ConversationMessage],
     ) -> str | None:
-        async with httpx.AsyncClient(timeout=self._timeout_seconds) as client:
-            response = await client.post(
-                self._handle_messages_url,
-                headers=self._headers(business_user_id),
-                json={
-                    "messages": self._serialize_messages(messages),
-                },
-            )
+        try:
+            async with httpx.AsyncClient(timeout=self._timeout_seconds) as client:
+                response = await client.post(
+                    self._handle_messages_url,
+                    headers=self._headers(business_user_id),
+                    json={
+                        "messages": self._serialize_messages(messages),
+                    },
+                )
+        except httpx.RequestError as exc:
+            raise AgentResponseError(
+                f"Failed to reach Agent Server at {self._handle_messages_url}: {exc}"
+            ) from exc
 
         self._ensure_success(response)
 
@@ -53,15 +57,20 @@ class HttpAgentClient(AgentClient):
         closed_at: datetime,
         messages: list[ConversationMessage],
     ) -> None:
-        async with httpx.AsyncClient(timeout=self._timeout_seconds) as client:
-            response = await client.post(
-                self._close_session_url,
-                headers=self._headers(business_user_id),
-                json={
-                    "closed_at": closed_at.isoformat(),
-                    "messages": self._serialize_messages(messages),
-                },
-            )
+        try:
+            async with httpx.AsyncClient(timeout=self._timeout_seconds) as client:
+                response = await client.post(
+                    self._close_session_url,
+                    headers=self._headers(business_user_id),
+                    json={
+                        "closed_at": closed_at.isoformat(),
+                        "messages": self._serialize_messages(messages),
+                    },
+                )
+        except httpx.RequestError as exc:
+            raise AgentResponseError(
+                f"Failed to reach Agent Server at {self._close_session_url}: {exc}"
+            ) from exc
 
         self._ensure_success(response)
 

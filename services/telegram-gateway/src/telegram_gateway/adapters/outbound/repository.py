@@ -6,9 +6,6 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-from telegram_gateway.application.ports.telegram_binding_repository import (
-    TelegramBindingRepository,
-)
 from telegram_gateway.domain.models import TelegramBinding
 
 
@@ -38,7 +35,7 @@ class TelegramBindingModel(Base):
     )
 
 
-class PostgresTelegramBindingRepository(TelegramBindingRepository):
+class PostgresTelegramBindingRepository:
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 

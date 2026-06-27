@@ -2,12 +2,10 @@ import asyncio
 
 import httpx
 
-from telegram_gateway.application.ports.telegram_message_sender import (
-    TelegramMessageSender,
-)
 from telegram_gateway.application.errors import TelegramMessageDeliveryError
 
-class TelegramBotClient(TelegramMessageSender):
+
+class TelegramBotClient:
     def __init__(
         self,
         *,

@@ -24,7 +24,6 @@ class SendAgentMessage:
         *,
         business_user_id: UUID,
         text: str,
-        uow: UnitOfWork,
     ) -> str | None:
         self._log.info(
             "use_case.started",
@@ -32,16 +31,6 @@ class SendAgentMessage:
             business_user_id=str(business_user_id),
             text_length=len(text),
         )
-
-        async with uow:
-            binding = await uow.telegram_bindings.get_by_business_user_id(
-                business_user_id=business_user_id,
-            )
-
-        if binding is None:
-            raise TelegramBindingNotFoundError(
-                f"Telegram binding was not found for business_user_id={business_user_id}"
-            )
 
         user_message = ConversationMessage(
             role=ConversationMessageRole.USER,
@@ -87,7 +76,6 @@ class SendAgentMessage:
             "use_case.finished",
             use_case="send_agent_message",
             business_user_id=str(business_user_id),
-            telegram_chat_id=binding.telegram_chat_id,
             assistant_text_exists=True,
         )
 

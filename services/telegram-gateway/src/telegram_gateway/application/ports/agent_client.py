@@ -1,16 +1,17 @@
 from datetime import datetime
+from typing import Protocol
 from uuid import UUID
 
 from telegram_gateway.domain.models import ConversationMessage
 
 
-class AgentClient:
+class AgentClient(Protocol):
     async def handle_messages(
         self,
         business_user_id: UUID,
         messages: list[ConversationMessage],
     ) -> str | None:
-        raise NotImplementedError
+        ...
 
     async def close_session(
         self,
@@ -18,4 +19,4 @@ class AgentClient:
         closed_at: datetime,
         messages: list[ConversationMessage],
     ) -> None:
-        raise NotImplementedError
+        ...

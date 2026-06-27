@@ -2,12 +2,20 @@
 
 Telegram Gateway — это отдельный FastAPI-сервис, который связывает Backend, Agent Server и Telegram.
 
-Сейчас сервис используется в упрощённом D2V/MVP-режиме. Мы временно отказались от полноценного Telegram webhook-flow, потому что во время локального тестирования через ngrok сообщения могли приходить с большой задержкой и было сложно отделять задержки Telegram/ngrok от задержек внутри приложения.
+Сейчас сервис поддерживает полноценное общение через Telegram-бота:
 
-В текущей версии Telegram Gateway отвечает за две основные задачи:
+1. пользователь пишет боту `/start`;
+2. Telegram Gateway создаёт пользователя в Backend;
+3. Gateway получает `business_user_id`;
+4. Gateway привязывает `business_user_id` к `telegram_user_id` и `telegram_chat_id`;
+5. после этого пользователь может писать боту обычные сообщения;
+6. Gateway передаёт сообщения в Agent Server и отправляет ответ обратно в Telegram.
 
-1. отправлять сообщения пользователю в Telegram;
-2. хранить текущую сессию общения пользователя с агентом в Redis.
+Дополнительно сервис отвечает за:
+
+1. отправку уведомлений и ответов пользователю в Telegram;
+2. хранение текущей сессии общения пользователя с агентом в Redis;
+3. синхронизацию Telegram binding между Postgres, Backend и Telegram chat.
 
 ## Зачем нужен Telegram Gateway
 
@@ -21,98 +29,51 @@ business_user_id <-> telegram_user_id <-> telegram_chat_id
 
 Эта связь нужна, чтобы Backend и Runtime Context могли отправлять пользователю уведомления, напоминания и сообщения, не зная ничего о Telegram ID и Telegram Chat ID.
 
-Backend работает только с `business_user_id`. Telegram Gateway уже сам резолвит, в какой Telegram chat нужно отправить сообщение.
+Backend работает только с `business_user_id`. Telegram Gateway сам резолвит, в какой Telegram chat нужно отправить сообщение.
 
 ## Текущий статус
 
 Сервис проверен в локальном окружении:
 
 ```text
-Swagger / API -> Telegram Gateway -> Telegram Bot API -> Telegram chat
+Telegram chat -> Telegram Bot API -> Telegram Gateway -> Backend / Agent Server / Redis
 ```
 
-Также проверено, что сессия пользователя сохраняется и обновляется в Redis.
+Также проверено, что:
 
-## Что временно не используется
-
-В текущей версии не используется полноценный входящий Telegram webhook-flow:
-
-```text
-Telegram -> ngrok -> Telegram Gateway
-```
-
-Этот flow был поднят и проверен, но в локальном тестировании сообщения могли идти слишком долго. Поэтому для MVP сейчас используется более контролируемая схема через Swagger/API.
-
-В будущем webhook можно вернуть, когда будет готова стабильная продакшен-инфраструктура с публичным HTTPS endpoint.
+1. binding пользователя сохраняется в Postgres;
+2. сессия пользователя сохраняется и обновляется в Redis;
+3. webhook регистрируется автоматически при старте, если `USE_TELEGRAM=true`.
 
 ## Основной пользовательский flow
 
-### 1. Создать пользователя в Backend
+### 1. Пользователь пишет боту `/start`
 
-Сначала пользователь создаётся на стороне Backend.
+Telegram Gateway получает webhook update от Telegram и проверяет, есть ли уже binding для `telegram_user_id`.
 
-Backend возвращает `business_user_id`.
+Если binding ещё нет:
 
-Пример:
+1. Gateway создаёт пользователя в Backend;
+2. использует Telegram-поля для `login` и `name`;
+3. создаёт пароль по умолчанию;
+4. сохраняет binding между `business_user_id`, `telegram_user_id` и `telegram_chat_id`;
+5. отвечает пользователю сообщением о том, что аккаунт создан и чат привязан.
 
-```text
-e670eed3-66ef-452b-b53a-509f69071250
-```
+Если пользователь пишет не `/start`, а binding ещё не создан, Gateway просит сначала отправить `/start`.
 
-Этот ID дальше используется в Telegram Gateway.
+### 2. Пользователь пишет обычное сообщение
 
-### 2. Проверить пользователя через Telegram Gateway
+После привязки любой текст отправляется в Agent Server.
 
-В Telegram Gateway есть ручка:
+Что происходит внутри:
 
-```http
-POST /auth
-```
-
-Она принимает `business_user_id` и проверяет через Backend, что такой пользователь существует.
-
-Пример body:
-
-```json
-{
-  "business_user_id": "e670eed3-66ef-452b-b53a-509f69071250"
-}
-```
-
-Ответ:
-
-```json
-{
-  "access_token": "e670eed3-66ef-452b-b53a-509f69071250",
-  "token_type": "bearer"
-}
-```
-
-Сейчас `access_token` фактически равен `business_user_id`. Это сделано для простого MVP-тестирования.
-
-### 3. Привязать Telegram аккаунт
-
-После этого нужно привязать Telegram ID и Telegram Chat ID к `business_user_id`.
-
-Ручка:
-
-```http
-POST /telegram/attach
-```
-
-Пример body:
-
-```json
-{
-  "business_user_id": "e670eed3-66ef-452b-b53a-509f69071250",
-  "telegram_user_id": 1171103388,
-  "telegram_chat_id": 1171103388
-}
-```
-
-Для личного чата с ботом `telegram_user_id` и `telegram_chat_id` часто совпадают.
-
-После этого Gateway сохраняет binding в Postgres.
+1. Telegram Gateway получает webhook update;
+2. находит binding в Postgres;
+3. добавляет сообщение пользователя в Redis-сессию;
+4. передаёт историю сообщений в Agent Server;
+5. получает ответ агента;
+6. добавляет ответ в Redis-сессию;
+7. отправляет ответ пользователю в Telegram.
 
 ## Работа с агентом
 
@@ -289,6 +250,7 @@ telegram_gateway:session:{business_user_id}
 
 ```http
 GET  /health
+POST /telegram/webhook
 POST /auth
 POST /telegram/attach
 POST /agent/message
@@ -300,6 +262,8 @@ POST /telegram/notifications/send
 ## Запуск
 
 Перед запуском должны быть подняты Postgres и Redis.
+
+Для Telegram-бота также должен быть доступен публичный HTTPS URL, например через ngrok.
 
 Из директории сервиса:
 
@@ -331,6 +295,10 @@ DATABASE_URL=postgresql+asyncpg://planner:planner@localhost:5432/planner
 REDIS_URL=redis://localhost:6379/0
 
 TELEGRAM_BOT_TOKEN=...
+USE_TELEGRAM=true
+TELEGRAM_WEBHOOK_PUBLIC_URL=https://example.ngrok-free.dev
+TELEGRAM_WEBHOOK_SECRET=...
+TELEGRAM_WEBHOOK_DELETE_ON_SHUTDOWN=true
 INTERNAL_API_TOKEN=...
 
 BACKEND_HOST=localhost
@@ -339,6 +307,13 @@ BACKEND_PORT=8001
 AGENT_HOST=localhost
 AGENT_PORT=8002
 ```
+
+### Что важно знать про Telegram
+
+1. `USE_TELEGRAM=true` включает регистрацию webhook и входящий Telegram flow.
+2. `TELEGRAM_WEBHOOK_PUBLIC_URL` должен указывать на публичный HTTPS endpoint, который Telegram может достичь.
+3. `TELEGRAM_WEBHOOK_DELETE_ON_SHUTDOWN=true` удаляет webhook при остановке сервиса.
+4. `utc_offset_minutes` для создания пользователя сейчас берётся как `0`, потому что Telegram webhook не передаёт timezone пользователя напрямую.
 
 ## Роль сервиса в системе
 

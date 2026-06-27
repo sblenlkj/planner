@@ -10,6 +10,11 @@ from telegram_gateway.adapters.inbound.dependencies import (
     get_send_agent_message_use_case,
     get_send_telegram_notification_use_case,
     get_agent_session_use_case,
+    get_handle_telegram_webhook_message_use_case,
+    verify_telegram_webhook_secret,
+)
+from telegram_gateway.adapters.inbound.mappers import (
+    map_telegram_update_to_incoming_webhook_message,
 )
 from telegram_gateway.adapters.inbound.schemas import (
     AgentMessageRequest,
@@ -24,6 +29,7 @@ from telegram_gateway.adapters.inbound.schemas import (
     GetAgentSessionRequest,
     GetAgentSessionResponse,
     ConversationMessageResponse,
+    TelegramUpdateSchema,
 )
 from telegram_gateway.application.use_cases import (
     AttachTelegram,
@@ -32,6 +38,9 @@ from telegram_gateway.application.use_cases import (
     SendAgentMessage,
     SendTelegramNotification,
     GetAgentSession
+)
+from telegram_gateway.application.use_cases.handle_telegram_webhook_message import (
+    HandleTelegramWebhookMessage,
 )
 from telegram_gateway.logging import get_logger
 
@@ -111,7 +120,6 @@ async def send_agent_message(
     assistant_text = await use_case.send(
         business_user_id=request_body.business_user_id,
         text=request_body.text,
-        uow=uow,
     )
 
     return AgentMessageResponse(
@@ -192,3 +200,31 @@ async def close_agent_session(
         closed=closed,
         reason=None if closed else "no_active_session",
     )
+
+
+@router.post("/telegram/webhook", response_model=OkResponse)
+async def telegram_webhook(
+    update: TelegramUpdateSchema,
+    use_case: Annotated[
+        HandleTelegramWebhookMessage,
+        Depends(get_handle_telegram_webhook_message_use_case),
+    ],
+    uow: UowDep,
+    _: Annotated[None, Depends(verify_telegram_webhook_secret)],
+) -> OkResponse:
+    log.info(
+        "telegram_webhook.received",
+        update_id=update.update_id,
+        has_message=update.message is not None,
+        telegram_user_id=None if update.message is None else update.message.from_user.id,
+        telegram_chat_id=None if update.message is None else update.message.chat.id,
+        message_date=None if update.message is None else update.message.date,
+        text=None if update.message is None else update.message.text,
+    )
+
+    incoming = map_telegram_update_to_incoming_webhook_message(update)
+    if incoming is None:
+        return OkResponse()
+
+    await use_case.handle(incoming, uow=uow)
+    return OkResponse()

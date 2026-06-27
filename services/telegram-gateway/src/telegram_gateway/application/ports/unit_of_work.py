@@ -1,16 +1,18 @@
 from types import TracebackType
-from typing import Self
+from typing import Protocol
 
 from telegram_gateway.application.ports.telegram_binding_repository import (
     TelegramBindingRepository,
 )
 
 
-class UnitOfWork:
-    telegram_bindings: TelegramBindingRepository
+class UnitOfWork(Protocol):
+    @property
+    def telegram_bindings(self) -> TelegramBindingRepository:
+        ...
 
-    async def __aenter__(self) -> Self:
-        raise NotImplementedError
+    async def __aenter__(self) -> "UnitOfWork":
+        ...
 
     async def __aexit__(
         self,
@@ -18,10 +20,10 @@ class UnitOfWork:
         exc: BaseException | None,
         traceback: TracebackType | None,
     ) -> None:
-        raise NotImplementedError
+        ...
 
     async def commit(self) -> None:
-        raise NotImplementedError
+        ...
 
     async def rollback(self) -> None:
-        raise NotImplementedError
+        ...

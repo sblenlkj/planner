@@ -50,23 +50,3 @@ async def run_session_close(
         )
 
     return WorkflowOkResponse(ok=True)
-
-
-@router.post("/morning-briefing/run", response_model=MorningBriefingResponse)
-async def run_morning_briefing(
-    request: MorningBriefingRequest,
-    context: InternalRequestContext = Depends(get_internal_context),
-) -> MorningBriefingResponse:
-    # TODO:
-    # 1. Load user profile.
-    # 2. Load courses.
-    # 3. Load schedule date/day observations for request.date.
-    # 4. Load active commitments.
-    # 5. Generate morning briefing text.
-    return MorningBriefingResponse(
-        ok=True,
-        assistant_text=(
-            f"Доброе утро. Это тестовый morning briefing на {request.date} "
-            f"для пользователя {context.business_user_id}."
-        ),
-    )
