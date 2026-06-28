@@ -158,6 +158,7 @@ POST /agent/session/close
 }
 ```
 
+
 Что происходит:
 
 1. Telegram Gateway достаёт текущую Redis-сессию пользователя.
